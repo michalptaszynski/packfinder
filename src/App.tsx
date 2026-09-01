@@ -38,7 +38,7 @@ function Shell() {
           showRightPanel ? 'w-[380px]' : 'w-full',
         )}
       >
-        <div className="flex h-11 flex-none items-center justify-between border-b border-border px-4">
+        <div className="flex h-11 flex-none items-center justify-between px-4">
           <Button variant="ghost" size="icon-sm" className="text-muted-foreground">
             <House size={16} strokeWidth={1.75} />
           </Button>

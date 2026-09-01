@@ -36,7 +36,7 @@ export function ChatHero() {
   const rest = CATEGORY_PRESETS.filter((p) => !FEATURED_ORDER.includes(p.id))
 
   return (
-    <div className="flex flex-1 flex-col gap-7 overflow-y-auto pr-1">
+    <div className="flex flex-col gap-7">
       <div>
         <h2 className="text-4xl font-light tracking-tight text-balance">Find your packaging</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
@@ -54,13 +54,15 @@ export function ChatHero() {
         />
         <div ref={mainRef} className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {main.map((preset) => (
-            <button key={preset.id} type="button" onClick={() => pick(preset)} className="flex min-w-0 flex-1 flex-col gap-2 text-left">
+            <button key={preset.id} type="button" onClick={() => pick(preset)} className="group flex min-w-0 flex-1 flex-col gap-2 text-left">
               {preset.photo ? (
-                <img
-                  src={preset.photo}
-                  alt=""
-                  className="aspect-[3/4] w-full rounded-xl object-cover transition-opacity hover:opacity-80"
-                />
+                <div className="aspect-[3/4] w-full overflow-hidden rounded-xl">
+                  <img
+                    src={preset.photo}
+                    alt=""
+                    className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-110"
+                  />
+                </div>
               ) : (
                 <div className="aspect-[3/4] w-full rounded-xl bg-muted transition-colors hover:bg-muted/70" />
               )}
@@ -83,9 +85,15 @@ export function ChatHero() {
           className="grid grid-flow-col grid-rows-3 gap-x-6 gap-y-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {rest.map((preset) => (
-            <button key={preset.id} type="button" onClick={() => pick(preset)} className="flex w-44 items-center gap-3 text-left">
+            <button key={preset.id} type="button" onClick={() => pick(preset)} className="group flex w-44 items-center gap-3 text-left">
               {preset.photo ? (
-                <img src={preset.photo} alt="" className="size-10 flex-none rounded-lg object-cover" />
+                <span className="size-10 flex-none overflow-hidden rounded-lg">
+                  <img
+                    src={preset.photo}
+                    alt=""
+                    className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-110"
+                  />
+                </span>
               ) : (
                 <span className="size-10 flex-none rounded-lg bg-muted" />
               )}

@@ -23,7 +23,7 @@ export function Chat() {
   const lastAskedStep = useRef<number | null>(0)
   const announcedComplete = useRef(false)
   const lastAnnouncedChoice = useRef<string | null>(null)
-  const logRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
 
   const status = quizStatus(state.slots)
   const isFresh = status.nextStep === 0 && !state.messages.some((m) => m.role === 'user')
@@ -69,8 +69,9 @@ export function Chat() {
   }, [state.chosenDirectionId])
 
   useEffect(() => {
-    logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: 'smooth' })
-  }, [state.messages])
+    if (isFresh) return
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
+  }, [state.messages, isFresh])
 
   function pushAssistant(text: string) {
     dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'assistant', text } })
@@ -110,39 +111,44 @@ export function Chat() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4">
-      {isFresh ? (
-        <ChatHero />
-      ) : (
-        <>
-          <div ref={logRef} className="flex flex-1 flex-col gap-2.5 overflow-y-auto pr-1">
-            {state.messages.map((message) => (
-              <ChatBubble key={message.id} message={message} />
-            ))}
-          </div>
-
-          {!status.complete && <QuizControls />}
-
-          {state.suggestions.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {state.suggestions.map((suggestion) => (
-                <Button
-                  key={suggestion}
-                  variant="outline"
-                  size="sm"
-                  className="rounded-full text-xs font-normal text-muted-foreground"
-                  onClick={() => handleSend(suggestion)}
-                >
-                  {suggestion}
-                </Button>
+    <div className="relative h-full">
+      <div
+        ref={scrollRef}
+        className="absolute inset-0 overflow-y-auto pb-32 pr-1 [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_16px,black_calc(100%-16px),transparent)] [mask-image:linear-gradient(to_bottom,transparent,black_16px,black_calc(100%-16px),transparent)]"
+      >
+        {isFresh ? (
+          <ChatHero />
+        ) : (
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2.5">
+              {state.messages.map((message) => (
+                <ChatBubble key={message.id} message={message} />
               ))}
             </div>
-          )}
-        </>
-      )}
+
+            {!status.complete && <QuizControls />}
+
+            {state.suggestions.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {state.suggestions.map((suggestion) => (
+                  <Button
+                    key={suggestion}
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full text-xs font-normal text-muted-foreground"
+                    onClick={() => handleSend(suggestion)}
+                  >
+                    {suggestion}
+                  </Button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       <form
-        className="flex w-full flex-none flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl"
+        className="absolute inset-x-0 bottom-0 flex w-full flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl"
         onSubmit={(e) => {
           e.preventDefault()
           handleSend(input)
