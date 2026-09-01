@@ -1,23 +1,12 @@
 import { useState } from 'react'
 import { useSessionDispatch, useSessionState } from '@/state/SessionProvider'
 import { quizStatus } from '@/state/quizStatus'
-import { CATEGORY_PRESETS, CHANNEL_OPTIONS, QUIZ_QUESTIONS } from '@/data/categoryPresets'
+import { CATEGORY_PRESETS, CHANNEL_OPTIONS, DIMENSION_REFERENCE_CHIPS, QUIZ_QUESTIONS } from '@/data/categoryPresets'
 import { formatMoney } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { OptionRow, QuestionShell, RadioDot } from './QuestionShell'
 import type { CategoryPreset } from '@/data/categoryPresets'
 import type { Dimensions, Slots } from '@/types'
-
-const SIZE_BANDS = [
-  { id: 'small', title: 'Małe (do ok. 10 cm)', description: 'Biżuteria, kosmetyki, drobiazgi.', dims: { w: 60, h: 80, d: 30 } as Dimensions },
-  {
-    id: 'medium',
-    title: 'Średnie (10–20 cm)',
-    description: 'Ubrania złożone, butelki, pudełka prezentowe.',
-    dims: { w: 150, h: 200, d: 80 } as Dimensions,
-  },
-  { id: 'large', title: 'Duże (powyżej 20 cm)', description: 'Ubrania rozłożone, większe zestawy.', dims: { w: 280, h: 350, d: 120 } as Dimensions },
-]
 
 const QUANTITY_BANDS = [
   { id: 'q1', title: '30–100 szt.', description: 'Pierwsza mała partia, testowanie rynku.', value: 65 },
@@ -157,53 +146,59 @@ function ChannelStep({ onCommit, onBack, canGoBack, onSkipAll }: StepProps) {
 }
 
 function DimensionsStep({ slots, onCommit, onBack, canGoBack, onSkipAll }: StepProps) {
-  const [selected, setSelected] = useState<string | null>(null)
-  const [custom, setCustom] = useState<Dimensions>(slots.dimensions?.value ?? { w: 0, h: 0, d: 0 })
+  const [dims, setDims] = useState<Dimensions>(slots.dimensions?.value ?? { w: 0, h: 0, d: 0 })
 
-  const customValid = custom.w > 0 && custom.h > 0 && custom.d > 0
-  const canProceed = selected !== null && (selected !== 'custom' || customValid)
+  const canProceed = dims.w > 0 && dims.h > 0 && dims.d > 0
 
   function handleNext() {
-    if (selected === 'custom') {
-      onCommit(`${custom.w} × ${custom.h} × ${custom.d} mm`, { dimensions: { value: custom, source: 'quiz' } })
-      return
-    }
-    const band = SIZE_BANDS.find((b) => b.id === selected)
-    if (!band) return
-    onCommit(band.title, { dimensions: { value: band.dims, source: 'quiz' } })
+    onCommit(`${dims.w} × ${dims.h} × ${dims.d} mm`, { dimensions: { value: dims, source: 'quiz' } })
   }
 
   return (
     <QuestionShell title={QUIZ_QUESTIONS[2]} onBack={onBack} canGoBack={canGoBack} onSkipAll={onSkipAll} onNext={handleNext} nextDisabled={!canProceed}>
-      {SIZE_BANDS.map((band) => (
-        <OptionRow key={band.id} selected={selected === band.id} title={band.title} description={band.description} onClick={() => setSelected(band.id)} />
-      ))}
-      <div className={cn('flex items-center gap-3 px-4 py-3', selected === 'custom' && 'bg-state-bg/60')}>
-        <button type="button" onClick={() => setSelected('custom')} className="flex-none">
-          <RadioDot selected={selected === 'custom'} />
-        </button>
-        <span className="flex-none text-xs text-muted-foreground">Dokładnie:</span>
-        <div className="flex flex-1 items-center gap-1.5">
-          <DimInput value={custom.w} onFocus={() => setSelected('custom')} onChange={(w) => setCustom((c) => ({ ...c, w }))} />
-          <span className="text-xs text-muted-foreground">×</span>
-          <DimInput value={custom.h} onFocus={() => setSelected('custom')} onChange={(h) => setCustom((c) => ({ ...c, h }))} />
-          <span className="text-xs text-muted-foreground">×</span>
-          <DimInput value={custom.d} onFocus={() => setSelected('custom')} onChange={(d) => setCustom((c) => ({ ...c, d }))} />
-          <span className="text-xs text-muted-foreground">mm</span>
+      <div className="flex flex-col gap-3 px-4 py-4">
+        <p className="text-xs text-muted-foreground">
+          Podaj dokładne wymiary produktu (mm) — silnik doliczy zapas i pokaże wymiar zewnętrzny opakowania.
+        </p>
+        <div className="flex items-end gap-2">
+          <label className="flex flex-1 flex-col gap-1 text-xs text-muted-foreground">
+            Szerokość
+            <DimInput value={dims.w} onChange={(w) => setDims((c) => ({ ...c, w }))} />
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-xs text-muted-foreground">
+            Wysokość
+            <DimInput value={dims.h} onChange={(h) => setDims((c) => ({ ...c, h }))} />
+          </label>
+          <label className="flex flex-1 flex-col gap-1 text-xs text-muted-foreground">
+            Głębokość
+            <DimInput value={dims.d} onChange={(d) => setDims((c) => ({ ...c, d }))} />
+          </label>
+          <span className="pb-1.5 text-xs text-muted-foreground">mm</span>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {DIMENSION_REFERENCE_CHIPS.map((chip) => (
+            <button
+              key={chip.label}
+              type="button"
+              onClick={() => setDims(chip.dimensions)}
+              className="rounded-full border border-input px-2.5 py-1 text-xs text-muted-foreground hover:bg-muted"
+            >
+              {chip.label}
+            </button>
+          ))}
         </div>
       </div>
     </QuestionShell>
   )
 }
 
-function DimInput({ value, onChange, onFocus }: { value: number; onChange: (v: number) => void; onFocus: () => void }) {
+function DimInput({ value, onChange }: { value: number; onChange: (v: number) => void }) {
   return (
     <input
       type="number"
       value={value || ''}
-      onFocus={onFocus}
       onChange={(e) => onChange(Number(e.target.value))}
-      className="w-14 rounded-md border border-input bg-transparent px-2 py-1 text-sm outline-none focus-visible:border-ring"
+      className="w-full rounded-md border border-input bg-transparent px-2 py-1.5 text-sm outline-none focus-visible:border-ring"
     />
   )
 }
