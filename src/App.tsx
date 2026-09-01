@@ -29,11 +29,11 @@ function Shell() {
   const showRightPanel = status.complete
 
   return (
-    <div className="flex h-svh w-full overflow-hidden bg-canvas">
+    <div className="flex h-svh w-full gap-3 overflow-hidden bg-canvas p-3">
       <aside
         className={cn(
-          'flex flex-none flex-col bg-card transition-[width] duration-500 ease-out',
-          showRightPanel ? 'w-[380px] border-r border-border' : 'w-full',
+          'flex flex-none flex-col overflow-hidden rounded-xl border border-border bg-card transition-[width] duration-500 ease-out',
+          showRightPanel ? 'w-[380px]' : 'w-full',
         )}
       >
         <div className={cn('mx-auto flex h-full w-full flex-col gap-4 p-5', !showRightPanel && 'max-w-2xl')}>
