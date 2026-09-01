@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { CircleHelp, House } from 'lucide-react'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { Button } from '@/components/ui/button'
 import { SessionProvider, useSessionState } from '@/state/SessionProvider'
 import { quizStatus } from '@/state/quizStatus'
 import { Chat } from '@/components/Chat/Chat'
@@ -36,11 +38,21 @@ function Shell() {
           showRightPanel ? 'w-[380px]' : 'w-full',
         )}
       >
-        <div className={cn('mx-auto flex h-full w-full flex-col gap-4 p-5', !showRightPanel && 'max-w-[832px]')}>
-          <div>
-            <h1 className="text-lg font-semibold">Packfinder</h1>
-            <p className="text-xs text-muted-foreground">Packaging advisor</p>
+        <div className="flex h-11 flex-none items-center justify-between border-b border-border px-4">
+          <Button variant="ghost" size="icon-sm" className="text-muted-foreground">
+            <House size={16} strokeWidth={1.75} />
+          </Button>
+          <div className="flex items-center gap-1.5">
+            <Button variant="outline" size="sm" className="font-normal text-muted-foreground">
+              Browse products
+            </Button>
+            <Button variant="ghost" size="icon-sm" className="text-muted-foreground">
+              <CircleHelp size={16} strokeWidth={1.75} />
+            </Button>
           </div>
+        </div>
+
+        <div className={cn('mx-auto flex w-full min-h-0 flex-1 flex-col gap-4 p-5', !showRightPanel && 'max-w-[832px]')}>
           <Chat />
         </div>
       </aside>
