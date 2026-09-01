@@ -146,8 +146,15 @@ export function DirectionPanel() {
         </div>
 
         <SheetFooter>
-          <Button className="w-full" disabled={!price?.valid} onClick={() => dispatch({ type: 'CONFIRM_DIRECTION', id: direction.id })}>
-            Wybierz ten kierunek
+          <Button
+            className="w-full"
+            disabled={!price?.valid}
+            onClick={() => {
+              dispatch({ type: 'CONFIRM_DIRECTION', id: direction.id })
+              dispatch({ type: 'GO_TO_HANDOFF' })
+            }}
+          >
+            Otwórz w edytorze
           </Button>
         </SheetFooter>
       </SheetContent>
