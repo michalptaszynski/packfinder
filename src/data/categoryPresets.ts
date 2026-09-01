@@ -8,6 +8,7 @@ export interface CategoryPreset {
   weight: number
   fragility: Fragility
   foodContact?: boolean
+  photo?: string
 }
 
 export const CATEGORY_PRESETS: CategoryPreset[] = [
@@ -18,6 +19,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 250, h: 350, d: 50 },
     weight: 300,
     fragility: 'low',
+    photo: '/photos/main/clothing.jpg',
   },
   {
     id: 'cosmetics',
@@ -26,6 +28,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 60, h: 120, d: 60 },
     weight: 150,
     fragility: 'low',
+    photo: '/photos/main/cosmetics.jpg',
   },
   {
     id: 'gift_set',
@@ -42,6 +45,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 70, h: 220, d: 70 },
     weight: 500,
     fragility: 'high',
+    photo: '/photos/main/bottles.jpg',
   },
   {
     id: 'food',
@@ -51,6 +55,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     weight: 400,
     fragility: 'medium',
     foodContact: true,
+    photo: '/photos/main/food.jpg',
   },
   {
     id: 'jewelry',
@@ -59,6 +64,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 80, h: 60, d: 25 },
     weight: 50,
     fragility: 'medium',
+    photo: '/photos/main/jewelry.jpg',
   },
   {
     id: 'electronics',
@@ -67,6 +73,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 180, h: 120, d: 60 },
     weight: 350,
     fragility: 'high',
+    photo: '/photos/main/electronics.jpg',
   },
   {
     id: 'stationery',

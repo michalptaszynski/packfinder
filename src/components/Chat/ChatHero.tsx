@@ -10,8 +10,8 @@ const FEATURED_ORDER = ['clothing', 'cosmetics', 'gift_set', 'bottles', 'food']
  * The empty-state screen shown before the user has answered anything.
  * Two horizontally-scrolling sections, mirroring a "try a style" /
  * "discover something new" template picker: main categories as bigger
- * portrait cards, everything else as a compact two-column list. No real
- * photography exists yet, so every tile is a plain placeholder block.
+ * portrait cards, everything else as a compact two-column list. Categories
+ * without a `photo` fall back to a plain placeholder block.
  */
 export function ChatHero() {
   const dispatch = useSessionDispatch()
@@ -55,7 +55,15 @@ export function ChatHero() {
         <div ref={mainRef} className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {main.map((preset) => (
             <button key={preset.id} type="button" onClick={() => pick(preset)} className="flex min-w-0 flex-1 flex-col gap-2 text-left">
-              <div className="aspect-[3/4] w-full rounded-xl bg-muted transition-colors hover:bg-muted/70" />
+              {preset.photo ? (
+                <img
+                  src={preset.photo}
+                  alt=""
+                  className="aspect-[3/4] w-full rounded-xl object-cover transition-opacity hover:opacity-80"
+                />
+              ) : (
+                <div className="aspect-[3/4] w-full rounded-xl bg-muted transition-colors hover:bg-muted/70" />
+              )}
               <span className="text-xs text-muted-foreground">{preset.label}</span>
             </button>
           ))}
@@ -76,7 +84,11 @@ export function ChatHero() {
         >
           {rest.map((preset) => (
             <button key={preset.id} type="button" onClick={() => pick(preset)} className="flex w-44 items-center gap-3 text-left">
-              <span className="size-10 flex-none rounded-lg bg-muted" />
+              {preset.photo ? (
+                <img src={preset.photo} alt="" className="size-10 flex-none rounded-lg object-cover" />
+              ) : (
+                <span className="size-10 flex-none rounded-lg bg-muted" />
+              )}
               <span className="text-sm text-muted-foreground">{preset.label}</span>
             </button>
           ))}
