@@ -20,7 +20,7 @@ export function GridControls() {
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4">
         <span className="whitespace-nowrap text-sm font-medium">
-          Nakład: <span className="tabular-nums">{quantity} szt.</span>
+          Quantity: <span className="tabular-nums">{quantity} pcs</span>
         </span>
         <Slider
           min={0}
@@ -32,7 +32,7 @@ export function GridControls() {
         />
         {budgetTotal !== undefined && (
           <span className="whitespace-nowrap text-sm text-muted-foreground">
-            Budżet: <span className="tabular-nums font-medium text-foreground">{formatMoney(budgetTotal)}</span>
+            Budget: <span className="tabular-nums font-medium text-foreground">{formatMoney(budgetTotal)}</span>
           </span>
         )}
       </div>
@@ -47,16 +47,16 @@ export function GridControls() {
         variant="outline"
       >
         <ToggleGroupItem value="all" className="rounded-full px-3 data-[state=on]:bg-fill-hover">
-          Wszystkie
+          All
         </ToggleGroupItem>
         <ToggleGroupItem value="in_budget" className="rounded-full px-3 data-[state=on]:bg-fill-hover">
-          W budżecie
+          In budget
         </ToggleGroupItem>
         <ToggleGroupItem value="worth_stretch" className="rounded-full px-3 data-[state=on]:bg-fill-hover">
-          Warto dopłacić
+          Worth stretching for
         </ToggleGroupItem>
         <ToggleGroupItem value="cheapest" className="rounded-full px-3 data-[state=on]:bg-fill-hover">
-          Najtaniej
+          Cheapest
         </ToggleGroupItem>
       </ToggleGroup>
     </div>

@@ -9,17 +9,17 @@ import type { CategoryPreset } from '@/data/categoryPresets'
 import type { Dimensions, Slots } from '@/types'
 
 const QUANTITY_BANDS = [
-  { id: 'q1', title: '30–100 szt.', description: 'Pierwsza mała partia, testowanie rynku.', value: 65 },
-  { id: 'q2', title: '100–300 szt.', description: 'Standardowy pierwszy nakład.', value: 180 },
-  { id: 'q3', title: '300–1000 szt.', description: 'Większa partia, lepsza cena jednostkowa.', value: 600 },
-  { id: 'q4', title: '1000+ szt.', description: 'Duży wolumen, najniższa cena za sztukę.', value: 1500 },
+  { id: 'q1', title: '30–100 pcs', description: 'A first small batch, testing the market.', value: 65 },
+  { id: 'q2', title: '100–300 pcs', description: 'A standard first production run.', value: 180 },
+  { id: 'q3', title: '300–1000 pcs', description: 'A bigger batch, better unit price.', value: 600 },
+  { id: 'q4', title: '1000+ pcs', description: 'High volume, the lowest price per piece.', value: 1500 },
 ]
 
 const BUDGET_BANDS = [
-  { id: 'b1', title: 'Do £0.50 / szt.', description: 'Bardzo oszczędny wariant, funkcjonalne opakowanie.', value: 0.4 },
-  { id: 'b2', title: '£0.50 – £1.00 / szt.', description: 'Rozsądny standard e-commerce.', value: 0.75 },
-  { id: 'b3', title: '£1.00 – £3.00 / szt.', description: 'Podniesiony standard, więcej opcji wykończenia.', value: 2 },
-  { id: 'b4', title: 'Powyżej £3.00 / szt.', description: 'Premium — pudełka sztywne, złocenia.', value: 4 },
+  { id: 'b1', title: 'Up to £0.50 / pc', description: 'A very lean option, functional packaging.', value: 0.4 },
+  { id: 'b2', title: '£0.50 – £1.00 / pc', description: 'A reasonable e-commerce standard.', value: 0.75 },
+  { id: 'b3', title: '£1.00 – £3.00 / pc', description: 'A step up, more finishing options.', value: 2 },
+  { id: 'b4', title: 'Above £3.00 / pc', description: 'Premium — rigid boxes, foiling.', value: 4 },
 ]
 
 function buildSkipDefaults(slots: Slots): Partial<Slots> {
@@ -79,7 +79,7 @@ export function QuizControls() {
   }
 
   function skipAll() {
-    dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'user', text: 'Pomiń resztę pytań' } })
+    dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'user', text: 'Skip the rest of the questions' } })
     dispatch({ type: 'REBUILD_GRID', slots: buildSkipDefaults(state.slots) })
   }
 
@@ -158,19 +158,19 @@ function DimensionsStep({ slots, onCommit, onBack, canGoBack, onSkipAll }: StepP
     <QuestionShell title={QUIZ_QUESTIONS[2]} onBack={onBack} canGoBack={canGoBack} onSkipAll={onSkipAll} onNext={handleNext} nextDisabled={!canProceed}>
       <div className="flex flex-col gap-3 px-4 py-4">
         <p className="text-xs text-muted-foreground">
-          Podaj dokładne wymiary produktu (mm) — silnik doliczy zapas i pokaże wymiar zewnętrzny opakowania.
+          Give the product's exact dimensions (mm) — the engine adds clearance and shows the package's outer size.
         </p>
         <div className="flex items-end gap-2">
           <label className="flex flex-1 flex-col gap-1 text-xs text-muted-foreground">
-            Szerokość
+            Width
             <DimInput value={dims.w} onChange={(w) => setDims((c) => ({ ...c, w }))} />
           </label>
           <label className="flex flex-1 flex-col gap-1 text-xs text-muted-foreground">
-            Wysokość
+            Height
             <DimInput value={dims.h} onChange={(h) => setDims((c) => ({ ...c, h }))} />
           </label>
           <label className="flex flex-1 flex-col gap-1 text-xs text-muted-foreground">
-            Głębokość
+            Depth
             <DimInput value={dims.d} onChange={(d) => setDims((c) => ({ ...c, d }))} />
           </label>
           <span className="pb-1.5 text-xs text-muted-foreground">mm</span>
@@ -212,7 +212,7 @@ function QuantityStep({ onCommit, onBack, canGoBack, onSkipAll }: StepProps) {
 
   function handleNext() {
     if (selected === 'custom') {
-      onCommit(`${customNumber} szt.`, { quantity: { value: customNumber, source: 'quiz' } })
+      onCommit(`${customNumber} pcs`, { quantity: { value: customNumber, source: 'quiz' } })
       return
     }
     const band = QUANTITY_BANDS.find((b) => b.id === selected)
@@ -234,10 +234,10 @@ function QuantityStep({ onCommit, onBack, canGoBack, onSkipAll }: StepProps) {
           value={customValue}
           onFocus={() => setSelected('custom')}
           onChange={(e) => setCustomValue(e.target.value)}
-          placeholder="Podaj dokładny nakład..."
+          placeholder="Give the exact quantity..."
           className="w-full rounded-md border border-input bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring"
         />
-        <span className="flex-none text-xs text-muted-foreground">szt.</span>
+        <span className="flex-none text-xs text-muted-foreground">pcs</span>
       </div>
     </QuestionShell>
   )
@@ -254,7 +254,7 @@ function BudgetStep({ slots, onCommit, onBack, canGoBack, onSkipAll }: StepProps
   function handleNext() {
     const perPiece = selected === 'custom' ? customNumber : (BUDGET_BANDS.find((b) => b.id === selected)?.value ?? 0)
     const total = Math.round(perPiece * quantity * 100) / 100
-    onCommit(`${formatMoney(perPiece)}/szt. (razem ${formatMoney(total)})`, { budgetTotal: { value: total, source: 'quiz' } })
+    onCommit(`${formatMoney(perPiece)}/pc (${formatMoney(total)} total)`, { budgetTotal: { value: total, source: 'quiz' } })
   }
 
   return (
@@ -273,10 +273,10 @@ function BudgetStep({ slots, onCommit, onBack, canGoBack, onSkipAll }: StepProps
           value={customValue}
           onFocus={() => setSelected('custom')}
           onChange={(e) => setCustomValue(e.target.value)}
-          placeholder="Podaj dokładną kwotę na sztukę..."
+          placeholder="Give the exact amount per piece..."
           className="w-full rounded-md border border-input bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring"
         />
-        <span className="flex-none text-xs text-muted-foreground">/szt.</span>
+        <span className="flex-none text-xs text-muted-foreground">/pc</span>
       </div>
     </QuestionShell>
   )

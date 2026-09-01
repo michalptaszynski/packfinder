@@ -12,13 +12,13 @@ import { cn } from '@/lib/utils'
 const CATEGORIES: { key: string; label: string; options: string[] }[] = [
   {
     key: 'print',
-    label: 'Druk',
+    label: 'Print',
     options: ['print.none', 'print.one_colour', 'print.white_uv', 'print.multicolour_muted', 'print.multicolour_saturated', 'print.multicolour_premium'],
   },
-  { key: 'material', label: 'Materiał', options: ['material.kraft', 'material.white', 'material.white_both', 'material.coated'] },
-  { key: 'coverage', label: 'Pokrycie', options: ['coverage.outside', 'coverage.inside', 'coverage.inside_outside'] },
-  { key: 'finish', label: 'Wykończenie', options: ['finish.none', 'finish.matte_foil', 'finish.glossy_foil', 'finish.hot_stamping', 'finish.embossing'] },
-  { key: 'closure', label: 'Zamknięcie', options: ['closure.none', 'closure.single_strip', 'closure.double_strip'] },
+  { key: 'material', label: 'Material', options: ['material.kraft', 'material.white', 'material.white_both', 'material.coated'] },
+  { key: 'coverage', label: 'Coverage', options: ['coverage.outside', 'coverage.inside', 'coverage.inside_outside'] },
+  { key: 'finish', label: 'Finish', options: ['finish.none', 'finish.matte_foil', 'finish.glossy_foil', 'finish.hot_stamping', 'finish.embossing'] },
+  { key: 'closure', label: 'Closure', options: ['closure.none', 'closure.single_strip', 'closure.double_strip'] },
 ]
 
 export function DirectionPanel() {
@@ -69,8 +69,8 @@ export function DirectionPanel() {
 
           {price?.valid ? (
             <div className="flex items-baseline justify-between rounded-lg border border-border bg-muted/50 p-3">
-              <span className="text-lg font-semibold tabular-nums">{formatMoney(price.unit ?? 0)}/szt.</span>
-              <span className="text-sm text-muted-foreground tabular-nums">razem {formatMoney(price.total ?? 0)}</span>
+              <span className="text-lg font-semibold tabular-nums">{formatMoney(price.unit ?? 0)}/pc</span>
+              <span className="text-sm text-muted-foreground tabular-nums">{formatMoney(price.total ?? 0)} total</span>
             </div>
           ) : (
             <div className="rounded-lg border border-border bg-muted/50 p-3 text-sm text-muted-foreground">{price?.reason}</div>
@@ -124,7 +124,7 @@ export function DirectionPanel() {
 
           {availableAddons.length > 0 && (
             <div className="flex flex-col gap-2">
-              <span className="text-xs font-medium text-muted-foreground">Dodatki</span>
+              <span className="text-xs font-medium text-muted-foreground">Add-ons</span>
               <div className="flex flex-wrap gap-1.5">
                 {availableAddons.map(([id, def]) => (
                   <button
@@ -154,7 +154,7 @@ export function DirectionPanel() {
               dispatch({ type: 'GO_TO_HANDOFF' })
             }}
           >
-            Otwórz w edytorze
+            Open in editor
           </Button>
         </SheetFooter>
       </SheetContent>

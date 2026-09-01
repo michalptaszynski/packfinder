@@ -10,60 +10,67 @@ const VIBE_WORDS: Record<string, string> = {
   minimal: 'minimal',
   minimalist: 'minimal',
   bold: 'bold',
-  wyrazist: 'bold',
   eco: 'eco',
-  ekolog: 'eco',
   biodegrad: 'eco',
-  kompostow: 'eco',
+  compost: 'eco',
+  sustainab: 'eco',
   lux: 'lux',
-  luksus: 'lux',
+  luxury: 'lux',
   premium: 'lux',
   retro: 'retro',
   vintage: 'retro',
   playful: 'playful',
-  zabaw: 'playful',
-  kolorow: 'playful',
+  fun: 'playful',
+  colourful: 'playful',
+  colorful: 'playful',
 }
 
 const CATEGORY_KEYWORDS: Record<string, string> = {
-  ubran: 'clothing',
-  ciuch: 'clothing',
-  odzież: 'clothing',
-  odziez: 'clothing',
-  kosmetyk: 'cosmetics',
-  biżuteri: 'jewelry',
-  bizuteri: 'jewelry',
-  jedzeni: 'food',
-  żywność: 'food',
-  zywnosc: 'food',
-  spożyw: 'food',
-  butelk: 'bottles',
-  płyn: 'bottles',
-  plyn: 'bottles',
-  elektronik: 'electronics',
-  papeteri: 'stationery',
-  druk: 'stationery',
-  'zestaw prezent': 'gift_set',
+  cloth: 'clothing',
+  apparel: 'clothing',
+  garment: 'clothing',
+  cosmetic: 'cosmetics',
+  makeup: 'cosmetics',
+  skincare: 'cosmetics',
+  jewel: 'jewelry',
+  food: 'food',
+  snack: 'food',
+  bottle: 'bottles',
+  liquid: 'bottles',
+  drink: 'bottles',
+  electronic: 'electronics',
+  gadget: 'electronics',
+  stationery: 'stationery',
+  print: 'stationery',
+  'gift set': 'gift_set',
+  toy: 'toys',
+  footwear: 'footwear',
+  shoe: 'footwear',
+  sneaker: 'footwear',
+  supplement: 'health',
+  vitamin: 'health',
+  health: 'health',
+  accessor: 'accessories',
 }
 
 const CHANNEL_KEYWORDS: Record<string, Channel> = {
-  kurier: 'courier',
-  paczkomat: 'parcel_locker',
-  półk: 'retail_shelf',
-  polk: 'retail_shelf',
-  sklep: 'retail_shelf',
-  'do ręki': 'hand',
-  'do reki': 'hand',
-  'wysyłką prezent': 'gift',
-  prezentow: 'gift',
+  ship: 'courier',
+  courier: 'courier',
+  mail: 'courier',
+  deliver: 'courier',
+  shelf: 'retail_shelf',
+  'product box': 'retail_shelf',
+  retail: 'retail_shelf',
+  store: 'retail_shelf',
 }
 
 /**
  * Toy intent parser standing in for Claude's update_slots tool call. It only
  * ever proposes slot updates — pricing.ts and constraints.ts still own every
  * number and every compatibility verdict. Handles both free-form chat
- * ("zwiększ nakład do 500") and answers to the guided quiz questions typed
- * directly into the composer instead of clicked ("kosmetyki", "60x120x60").
+ * ("increase the quantity to 500") and answers to the guided quiz questions
+ * typed directly into the composer instead of clicked ("cosmetics",
+ * "60x120x60").
  */
 export function interpretMessage(text: string, currentSlots: Slots): Interpretation {
   const lower = text.toLowerCase()
@@ -102,9 +109,9 @@ export function interpretMessage(text: string, currentSlots: Slots): Interpretat
   }
 
   const qtyMatch =
-    lower.match(/(\d{2,5})\s*(?:szt\b|sztuk)/) ||
-    lower.match(/nakład\w*[^\d]{0,15}(\d{2,5})/) ||
-    lower.match(/zwięks\w*[^\d]{0,15}(\d{2,5})/)
+    lower.match(/(\d{2,5})\s*(?:pcs\b|pieces|units)/) ||
+    lower.match(/quantity\w*[^\d]{0,15}(\d{2,5})/) ||
+    lower.match(/increase\w*[^\d]{0,15}(\d{2,5})/)
   if (qtyMatch) {
     const value = Number(qtyMatch[1])
     if (Number.isFinite(value) && value > 0) {
@@ -113,7 +120,7 @@ export function interpretMessage(text: string, currentSlots: Slots): Interpretat
     }
   }
 
-  const budgetMatch = lower.match(/(\d{1,6}(?:[.,]\d{1,2})?)\s*(£|zł|złoty|złotych|pln|eur|euro|€|gbp|funt\w*)/)
+  const budgetMatch = lower.match(/(\d{1,6}(?:[.,]\d{1,2})?)\s*(£|gbp|pound\w*|eur\w*|€|pln|zloty)/)
   if (budgetMatch) {
     const raw = Number(budgetMatch[1].replace(',', '.'))
     if (Number.isFinite(raw) && raw > 0) {
@@ -135,7 +142,7 @@ export function interpretMessage(text: string, currentSlots: Slots): Interpretat
     matched = true
   }
 
-  if (/\beco\b|biodegrad|kompostow|ekologicz/i.test(lower)) {
+  if (/\beco\b|biodegrad|compost|sustainab/i.test(lower)) {
     slotUpdates.ecoRequirement = { value: 'required', source: 'chat' }
     matched = true
   }

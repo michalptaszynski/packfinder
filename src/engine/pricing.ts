@@ -84,26 +84,26 @@ export interface PriceConfigInput {
 /** The only source of prices in the app — mirrors the price_configuration tool contract. */
 export function priceConfiguration(input: PriceConfigInput): PriceConfigResult {
   const archetype = getArchetype(input.archetypeId)
-  if (!archetype) return { valid: false, reason: 'Nieznany archetyp.' }
+  if (!archetype) return { valid: false, reason: 'Unknown archetype.' }
 
   if (archetype.sizeMultiplier[input.sizeCode] === undefined) {
-    return { valid: false, reason: 'Nieznany rozmiar dla tego archetypu.' }
+    return { valid: false, reason: 'Unknown size for this archetype.' }
   }
 
   if (input.quantity < archetype.moq) {
-    return { valid: false, reason: `Minimalny nakład dla tego formatu to ${archetype.moq} szt.` }
+    return { valid: false, reason: `The minimum quantity for this format is ${archetype.moq} pcs.` }
   }
 
   for (const key of input.modifiers) {
     const mod = modifierLibrary[key]
     if (mod?.minQty && input.quantity < mod.minQty) {
-      return { valid: false, reason: `${mod.label} wymaga nakładu min. ${mod.minQty} szt.` }
+      return { valid: false, reason: `${mod.label} needs a minimum quantity of ${mod.minQty} pcs.` }
     }
   }
 
   const unit = unitForQuantity(archetype, input.sizeCode, input.quantity, input.modifiers)
   if (unit === null) {
-    return { valid: false, reason: 'Nakład poza zakresem cennika — poproś o indywidualną wycenę.' }
+    return { valid: false, reason: 'Quantity is outside the price list range — ask for a custom quote.' }
   }
 
   const total = unit * input.quantity

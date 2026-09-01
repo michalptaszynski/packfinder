@@ -3,11 +3,11 @@ import { cn } from '@/lib/utils'
 
 /**
  * The brief itself explicitly rules out hotlinking real Pinterest images
- * ("hotlinkowanie rozjeżdża się po kilku dniach" — brief-doradca-opakowan.md
- * section 9) — so this fans out styled placeholder cards instead of real
- * photos. Same spirit as the "search Pinterest for packaging ideas" ask
- * (a loose moodboard collage while the grid is being put together) without
- * the dead-link risk the brief was written to avoid.
+ * ("hotlinked images rot within days" — brief-doradca-opakowan.md section 9)
+ * — so this fans out styled placeholder cards instead of real photos. Same
+ * spirit as the "search Pinterest for packaging ideas" ask (a loose
+ * moodboard collage while the grid is being put together) without the
+ * dead-link risk the brief was written to avoid.
  */
 const COLLAGE_CARDS = [
   { rotate: -8, x: -92, y: 14, gradient: 'from-amber-100 to-amber-200/70', delay: '0ms' },
@@ -22,7 +22,7 @@ export function GeneratingState() {
     <div className="flex flex-1 flex-col items-center justify-center gap-8 p-6">
       <span className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground shadow-sm">
         <Loader2 size={15} className="animate-spin" />
-        Szukam inspiracji do Twojego opakowania...
+        Looking for inspiration for your packaging...
       </span>
 
       <div className="relative h-56 w-64">
@@ -46,7 +46,7 @@ export function GeneratingState() {
       </div>
 
       <p className="max-w-[220px] text-center text-xs leading-relaxed text-muted-foreground">
-        Dobieram kierunki pasujące do tego, co pakujesz, i Twojego budżetu.
+        Matching directions to what you're packing and your budget.
       </p>
     </div>
   )

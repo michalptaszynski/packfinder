@@ -39,10 +39,10 @@ export function QuestionShell({ title, children, onBack, canGoBack, onSkipAll, o
 
         <div className="flex items-center gap-3">
           <button type="button" onClick={onSkipAll} className="text-xs text-muted-foreground hover:text-foreground">
-            Pomiń wszystko
+            Skip all
           </button>
           <Button size="sm" onClick={onNext} disabled={nextDisabled}>
-            Dalej
+            Next
           </Button>
         </div>
       </div>

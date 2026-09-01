@@ -40,7 +40,7 @@ export function DirectionCardTile({ card, highlighted, chosen, onOpen }: Directi
         <span className="text-sm font-medium leading-snug">{direction.label}</span>
         <span className="flex items-baseline justify-between text-xs text-muted-foreground">
           <span>{archetype.label}</span>
-          {price.valid && <span className="tabular-nums font-medium text-foreground">{formatMoney(price.unit ?? 0)}/szt.</span>}
+          {price.valid && <span className="tabular-nums font-medium text-foreground">{formatMoney(price.unit ?? 0)}/pc</span>}
         </span>
       </div>
 

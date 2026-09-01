@@ -2,6 +2,7 @@ import { createContext, useContext, useReducer } from 'react'
 import type { Dispatch, ReactNode } from 'react'
 import type { ChatMessage, DirectionCard, GridFilter, Slots } from '../types'
 import { buildGrid } from '../engine/grid'
+import { QUIZ_QUESTIONS } from '../data/categoryPresets'
 
 export type Screen = 'conversation' | 'handoff'
 
@@ -53,7 +54,7 @@ const initialState: SessionState = {
   chosenDirectionId: null,
   customModifiers: null,
   selectedAddons: [],
-  messages: [{ id: 'quiz-q0', role: 'assistant', text: 'Co pakujesz?' }],
+  messages: [{ id: 'quiz-q0', role: 'assistant', text: QUIZ_QUESTIONS[0] }],
   suggestions: [],
 }
 

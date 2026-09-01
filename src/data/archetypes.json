@@ -3,54 +3,54 @@
     "version": "0.1",
     "currency": "GBP",
     "displayCurrencyRate": { "EUR": 1.17, "PLN": 5.05 },
-    "priceBasis": "cena jednostkowa netto, konfiguracja bazowa (kraft, druk 1 kolor, zadruk zewnętrzny, bez folii)",
-    "interpolation": "interpolacja logarytmiczna między punktami krzywej; ekstrapolacja zabroniona – poza zakresem zwróć 'get_a_quote'",
+    "priceBasis": "net unit price, base configuration (kraft, 1-colour print, outside coverage, no foil)",
+    "interpolation": "log interpolation between curve points; extrapolation is forbidden – return 'get_a_quote' outside the range",
     "sourceLegend": {
-      "observed": "dane zdjęte z packhelp.co.uk – wiarygodne",
-      "mocked": "oszacowanie na potrzeby prototypu – NIE pokazywać jako wiążącej wyceny"
+      "observed": "data pulled from packhelp.co.uk – reliable",
+      "mocked": "estimate for prototype purposes – DO NOT show as a binding quote"
     },
-    "uiRule": "archetypy o source='mocked' renderują badge 'cena orientacyjna' przy każdej kwocie",
-    "photoPolicy": "cztery główne archetypy: własna fotografia Packhelp; reszta: Unsplash/Pexels po stałych ID. Spójny rejestr: jedno opakowanie w kadrze, czyste tło, minimalny nadruk, światło studyjne."
+    "uiRule": "archetypes with source='mocked' render a 'estimated price' badge next to every amount",
+    "photoPolicy": "four hero archetypes: Packhelp's own photography; the rest: Unsplash/Pexels with fixed IDs. Consistent register: one package in frame, clean background, minimal print, studio lighting."
   },
 
   "modifierLibrary": {
-    "print.none":                  { "label": "Bez druku",                 "unitDelta": 0.00 },
-    "print.one_colour":             { "label": "1 kolor",                   "unitDelta": 0.00 },
-    "print.white_uv":               { "label": "Biały UV",                  "unitMultiplier": 1.15 },
-    "print.multicolour_muted":      { "label": "Multicolour stonowany",     "unitDelta": 0.09 },
-    "print.multicolour_saturated":  { "label": "Multicolour nasycony",      "unitDelta": 0.18 },
-    "print.multicolour_premium":    { "label": "Multicolour premium",       "unitDelta": 0.31, "minQty": 120 },
-    "coverage.outside":             { "label": "Zadruk zewnętrzny",         "unitMultiplier": 1.00 },
-    "coverage.inside":              { "label": "Zadruk wewnętrzny",         "unitMultiplier": 1.12 },
-    "coverage.inside_outside":      { "label": "Zadruk obustronny",         "unitMultiplier": 1.22 },
-    "material.kraft":               { "label": "Kraft",                     "unitMultiplier": 1.00, "eco": true },
-    "material.white":               { "label": "Biały",                     "unitMultiplier": 1.06, "eco": true },
-    "material.white_both":          { "label": "Biały dwustronnie",         "unitMultiplier": 1.14, "eco": true },
-    "material.coated":              { "label": "Powlekany",                 "unitMultiplier": 1.20, "eco": false },
-    "finish.none":                  { "label": "Bez wykończenia",           "unitDelta": 0.00 },
-    "finish.matte_foil":            { "label": "Folia matowa",              "unitMultiplier": 1.18, "breaksEco": true },
-    "finish.glossy_foil":           { "label": "Folia błyszcząca",          "unitMultiplier": 1.18, "breaksEco": true },
-    "finish.hot_stamping":          { "label": "Hot stamping",              "unitDelta": 0.42, "minQty": 120 },
-    "finish.embossing":             { "label": "Tłoczenie",                 "unitDelta": 0.35, "minQty": 120 },
-    "closure.none":                 { "label": "Bez paska",                 "unitDelta": 0.00 },
-    "closure.single_strip":         { "label": "Pasek klejowy",             "unitDelta": 0.04 },
-    "closure.double_strip":         { "label": "Podwójny pasek (zwroty)",   "unitDelta": 0.07 }
+    "print.none":                  { "label": "No print",                 "unitDelta": 0.00 },
+    "print.one_colour":             { "label": "1 colour",                 "unitDelta": 0.00 },
+    "print.white_uv":               { "label": "White UV",                 "unitMultiplier": 1.15 },
+    "print.multicolour_muted":      { "label": "Multicolour, muted",       "unitDelta": 0.09 },
+    "print.multicolour_saturated":  { "label": "Multicolour, saturated",   "unitDelta": 0.18 },
+    "print.multicolour_premium":    { "label": "Multicolour, premium",     "unitDelta": 0.31, "minQty": 120 },
+    "coverage.outside":             { "label": "Outside coverage",         "unitMultiplier": 1.00 },
+    "coverage.inside":              { "label": "Inside coverage",          "unitMultiplier": 1.12 },
+    "coverage.inside_outside":      { "label": "Inside + outside",         "unitMultiplier": 1.22 },
+    "material.kraft":               { "label": "Kraft",                    "unitMultiplier": 1.00, "eco": true },
+    "material.white":               { "label": "White",                    "unitMultiplier": 1.06, "eco": true },
+    "material.white_both":          { "label": "White, both sides",        "unitMultiplier": 1.14, "eco": true },
+    "material.coated":              { "label": "Coated",                   "unitMultiplier": 1.20, "eco": false },
+    "finish.none":                  { "label": "No finish",                "unitDelta": 0.00 },
+    "finish.matte_foil":            { "label": "Matte foil",               "unitMultiplier": 1.18, "breaksEco": true },
+    "finish.glossy_foil":           { "label": "Gloss foil",               "unitMultiplier": 1.18, "breaksEco": true },
+    "finish.hot_stamping":          { "label": "Hot stamping",             "unitDelta": 0.42, "minQty": 120 },
+    "finish.embossing":             { "label": "Embossing",                "unitDelta": 0.35, "minQty": 120 },
+    "closure.none":                 { "label": "No strip",                 "unitDelta": 0.00 },
+    "closure.single_strip":         { "label": "Adhesive strip",           "unitDelta": 0.04 },
+    "closure.double_strip":         { "label": "Double strip (returns)",   "unitDelta": 0.07 }
   },
 
   "addons": {
-    "tissue_paper":   { "label": "Bibułka z nadrukiem",       "minQty": 30,  "unitDelta": 0.12, "source": "mocked" },
-    "branded_tape":   { "label": "Taśma brandowana",          "minQty": 36,  "unitDelta": 0.06, "source": "mocked" },
-    "stickers":       { "label": "Naklejki",                  "minQty": 250, "unitDelta": 0.05, "source": "mocked" },
-    "insert":         { "label": "Insert / wypraska",         "minQty": 240, "unitDelta": 0.28, "source": "mocked" },
-    "thank_you_card": { "label": "Karta z podziękowaniem",    "minQty": 30,  "unitDelta": 0.09, "source": "mocked" },
-    "void_fill":      { "label": "Wypełniacz",                "minQty": 1,   "unitDelta": 0.03, "source": "mocked" }
+    "tissue_paper":   { "label": "Printed tissue paper",  "minQty": 30,  "unitDelta": 0.12, "source": "mocked" },
+    "branded_tape":   { "label": "Branded tape",           "minQty": 36,  "unitDelta": 0.06, "source": "mocked" },
+    "stickers":       { "label": "Stickers",                "minQty": 250, "unitDelta": 0.05, "source": "mocked" },
+    "insert":         { "label": "Insert / tray",          "minQty": 240, "unitDelta": 0.28, "source": "mocked" },
+    "thank_you_card": { "label": "Thank-you card",         "minQty": 30,  "unitDelta": 0.09, "source": "mocked" },
+    "void_fill":      { "label": "Void fill",              "minQty": 1,   "unitDelta": 0.03, "source": "mocked" }
   },
 
   "archetypes": [
     {
       "id": "mailer",
-      "label": "Pudełko z klapą",
-      "story": "Klasyk e-commerce. Otwiera się jak książka – najlepszy stosunek efektu unboxingu do ceny.",
+      "label": "Mailer box",
+      "story": "The e-commerce classic. Opens like a book – the best unboxing-effect-to-price ratio.",
       "channels": ["courier", "parcel_locker", "gift"],
       "protection": "medium",
       "moq": 30,
@@ -58,7 +58,7 @@
       "assetTier": "full",
       "priceCurve": {
         "source": "observed",
-        "note": "Custom Mailer Box F23 (9,2 × 9,2 × 5 cm), kraft, 1 kolor, zadruk zewnętrzny",
+        "note": "Custom Mailer Box F23 (9.2 x 9.2 x 5 cm), kraft, 1 colour, outside coverage",
         "points": [
           { "qty": 30, "unit": 1.58 }, { "qty": 60, "unit": 1.03 }, { "qty": 90, "unit": 0.82 },
           { "qty": 120, "unit": 0.74 }, { "qty": 240, "unit": 0.52 }, { "qty": 500, "unit": 0.40 },
@@ -79,17 +79,17 @@
         "closure.none", "closure.single_strip", "closure.double_strip"
       ],
       "constraints": [
-        { "if": ["print.multicolour_muted"], "forbid": ["coverage.inside", "coverage.inside_outside"], "reason": "Druk stonowany nie obsługuje zadruku tła ani wnętrza." },
-        { "if": ["print.multicolour_saturated"], "forbid": ["coverage.inside"], "reason": "Nasycony druk nie jest dostępny wyłącznie na wnętrzu." },
-        { "if": ["print.multicolour_premium", "coverage.inside_outside"], "require": ["material.white_both"], "reason": "Premium obustronnie wymaga materiału białego z obu stron." }
+        { "if": ["print.multicolour_muted"], "forbid": ["coverage.inside", "coverage.inside_outside"], "reason": "Muted print doesn't support background or inside coverage." },
+        { "if": ["print.multicolour_saturated"], "forbid": ["coverage.inside"], "reason": "Saturated print isn't available as inside-only." },
+        { "if": ["print.multicolour_premium", "coverage.inside_outside"], "require": ["material.white_both"], "reason": "Premium on both sides requires white material on both sides." }
       ],
       "assets": { "photo": "/photos/mailer.jpg", "photoSource": "packhelp", "aspect": 0.8, "fallback": "/schematics/mailer.svg" }
     },
 
     {
       "id": "shipping_box",
-      "label": "Karton wysyłkowy",
-      "story": "Prosty, mocny, do rzeczy cięższych. Mniej o efekt, bardziej o to, żeby dojechało.",
+      "label": "Shipping box",
+      "story": "Simple, sturdy, for heavier things. Less about the effect, more about it actually arriving.",
       "channels": ["courier"],
       "protection": "high",
       "moq": 80,
@@ -97,7 +97,7 @@
       "assetTier": "placeholder",
       "priceCurve": {
         "source": "mocked",
-        "note": "Skalowane z krzywej mailera: więcej materiału, mniej wykrojnika, ~1,08× przy niskim nakładzie",
+        "note": "Scaled from the mailer curve: more material, less die-cutting, ~1.08x at low volumes",
         "points": [
           { "qty": 80, "unit": 1.02 }, { "qty": 240, "unit": 0.58 }, { "qty": 500, "unit": 0.44 },
           { "qty": 1000, "unit": 0.38 }, { "qty": 2000, "unit": 0.36 }
@@ -113,15 +113,15 @@
         "finish.none", "closure.single_strip", "closure.double_strip"
       ],
       "constraints": [
-        { "if": ["*"], "forbid": ["finish.hot_stamping", "finish.embossing"], "reason": "Tektura falista transportowa nie przyjmuje wykończeń zdobniczych." }
+        { "if": ["*"], "forbid": ["finish.hot_stamping", "finish.embossing"], "reason": "Corrugated shipping board doesn't take decorative finishes." }
       ],
       "assets": { "photo": "/photos/shipping_box.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/shipping_box.svg" }
     },
 
     {
       "id": "product_box",
-      "label": "Pudełko produktowe",
-      "story": "Zamykane na zatrzask, stoi na półce. Do kosmetyków, suplementów, świec.",
+      "label": "Product box",
+      "story": "Snap-lock closure, stands on a shelf. For cosmetics, supplements, candles.",
       "channels": ["retail_shelf", "hand", "gift"],
       "protection": "low",
       "moq": 30,
@@ -129,7 +129,7 @@
       "assetTier": "placeholder",
       "priceCurve": {
         "source": "mocked",
-        "note": "Karton lity, lżejszy niż falisty, droższy wykrojnik przy małym nakładzie",
+        "note": "Solid board, lighter than corrugated, pricier die-cut at low volumes",
         "points": [
           { "qty": 30, "unit": 1.24 }, { "qty": 120, "unit": 0.58 }, { "qty": 500, "unit": 0.30 },
           { "qty": 1000, "unit": 0.26 }, { "qty": 2000, "unit": 0.24 }
@@ -150,8 +150,8 @@
 
     {
       "id": "folding_carton",
-      "label": "Kartonik składany",
-      "story": "Najtańszy sposób na porządne pudełko przy większym nakładzie. Płaski w transporcie.",
+      "label": "Folding carton",
+      "story": "The cheapest way to get a proper box at higher volumes. Flat in transit.",
       "channels": ["retail_shelf", "hand"],
       "protection": "low",
       "moq": 30,
@@ -159,7 +159,7 @@
       "assetTier": "full",
       "priceCurve": {
         "source": "mocked",
-        "note": "Najtańsza konstrukcja kartonowa; bardzo stroma krzywa skali",
+        "note": "Cheapest carton construction; very steep scale curve",
         "points": [
           { "qty": 30, "unit": 1.10 }, { "qty": 120, "unit": 0.46 }, { "qty": 500, "unit": 0.20 },
           { "qty": 1000, "unit": 0.16 }, { "qty": 2000, "unit": 0.14 }
@@ -175,15 +175,15 @@
         "finish.none", "finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping"
       ],
       "constraints": [
-        { "if": ["*"], "forbid": ["coverage.inside_outside"], "reason": "Ten format drukujemy tylko od zewnątrz." }
+        { "if": ["*"], "forbid": ["coverage.inside_outside"], "reason": "This format only prints on the outside." }
       ],
       "assets": { "photo": "/photos/folding_carton.jpg", "photoSource": "packhelp", "aspect": 0.8, "fallback": "/schematics/folding_carton.svg" }
     },
 
     {
       "id": "rigid_box",
-      "label": "Pudełko sztywne",
-      "story": "Ciężkie, magnetyczne, otwiera się z oporem. To jest ta półka, na której klient czuje, że kupił coś drogiego.",
+      "label": "Rigid box",
+      "story": "Heavy, magnetic, opens with resistance. This is the shelf where the customer feels they bought something expensive.",
       "channels": ["gift", "retail_shelf", "hand"],
       "protection": "high",
       "moq": 120,
@@ -191,7 +191,7 @@
       "assetTier": "full",
       "priceCurve": {
         "source": "mocked",
-        "note": "Konstrukcja ręcznie kaszerowana; płaska krzywa – skala pomaga słabo",
+        "note": "Hand-laminated construction; flat curve – scale barely helps",
         "points": [
           { "qty": 120, "unit": 3.80 }, { "qty": 250, "unit": 3.20 }, { "qty": 500, "unit": 2.90 },
           { "qty": 1000, "unit": 2.55 }, { "qty": 2000, "unit": 2.40 }
@@ -208,15 +208,15 @@
         "finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping", "finish.embossing"
       ],
       "constraints": [
-        { "if": ["*"], "forbid": ["material.kraft"], "reason": "Ten format występuje wyłącznie na materiałach kaszerowanych." }
+        { "if": ["*"], "forbid": ["material.kraft"], "reason": "This format only comes in laminated materials." }
       ],
       "assets": { "photo": "/photos/rigid_box.jpg", "photoSource": "packhelp", "aspect": 0.8, "fallback": "/schematics/rigid_box.svg" }
     },
 
     {
       "id": "drawer_box",
-      "label": "Pudełko szufladkowe",
-      "story": "Wysuwa się jak zapałki. Małe, prezentowe – biżuteria, skarpetki, kosmetyk.",
+      "label": "Drawer box",
+      "story": "Slides out like a matchbox. Small, gift-like – jewelry, socks, cosmetics.",
       "channels": ["gift", "hand", "retail_shelf"],
       "protection": "medium",
       "moq": 30,
@@ -224,7 +224,7 @@
       "assetTier": "placeholder",
       "priceCurve": {
         "source": "mocked",
-        "note": "Dwuelementowa konstrukcja – droższa niż snap lock, tańsza niż rigid",
+        "note": "Two-piece construction – pricier than snap lock, cheaper than rigid",
         "points": [
           { "qty": 30, "unit": 1.90 }, { "qty": 120, "unit": 0.95 }, { "qty": 500, "unit": 0.55 },
           { "qty": 1000, "unit": 0.47 }, { "qty": 2000, "unit": 0.44 }
@@ -246,8 +246,8 @@
 
     {
       "id": "tube",
-      "label": "Tuba kartonowa",
-      "story": "Do wszystkiego, co jest okrągłe albo zwinięte. Plakaty, butelka, świeca, kawa.",
+      "label": "Cardboard tube",
+      "story": "For anything round or rolled up. Posters, a bottle, a candle, coffee.",
       "channels": ["courier", "gift", "retail_shelf"],
       "protection": "high",
       "moq": 30,
@@ -255,7 +255,7 @@
       "assetTier": "placeholder",
       "priceCurve": {
         "source": "mocked",
-        "note": "Nawijana konstrukcja + wieczko; droga jednostkowo, słaba ekonomia skali",
+        "note": "Wound construction + lid; pricey per unit, weak economies of scale",
         "points": [
           { "qty": 30, "unit": 2.40 }, { "qty": 120, "unit": 1.30 }, { "qty": 500, "unit": 0.80 },
           { "qty": 1000, "unit": 0.70 }, { "qty": 2000, "unit": 0.66 }
@@ -271,15 +271,15 @@
         "finish.none", "finish.matte_foil", "finish.hot_stamping"
       ],
       "constraints": [
-        { "if": ["*"], "forbid": ["coverage.inside", "coverage.inside_outside"], "reason": "Wnętrze tuby nie jest zadrukowywane." }
+        { "if": ["*"], "forbid": ["coverage.inside", "coverage.inside_outside"], "reason": "The inside of the tube isn't printed." }
       ],
       "assets": { "photo": "/photos/tube.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/tube.svg" }
     },
 
     {
       "id": "poly_mailer",
-      "label": "Kurierka foliowa",
-      "story": "Najtańsza wysyłka, jaka istnieje. Lekka, wodoodporna, do rzeczy miękkich.",
+      "label": "Poly mailer",
+      "story": "The cheapest shipping there is. Light, waterproof, for soft goods.",
       "channels": ["courier", "parcel_locker"],
       "protection": "low",
       "moq": 100,
@@ -287,7 +287,7 @@
       "assetTier": "full",
       "priceCurve": {
         "source": "mocked",
-        "note": "Druk fleksograficzny na folii; bardzo niska cena jednostkowa",
+        "note": "Flexographic print on film; very low unit price",
         "points": [
           { "qty": 100, "unit": 0.42 }, { "qty": 500, "unit": 0.19 }, { "qty": 1000, "unit": 0.15 },
           { "qty": 2000, "unit": 0.12 }, { "qty": 5000, "unit": 0.09 }
@@ -302,17 +302,17 @@
         "coverage.outside", "closure.single_strip", "closure.double_strip"
       ],
       "constraints": [
-        { "if": ["*"], "forbid": ["finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping", "finish.embossing", "coverage.inside", "coverage.inside_outside"], "reason": "Folia nie przyjmuje wykończeń zdobniczych ani zadruku wnętrza." }
+        { "if": ["*"], "forbid": ["finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping", "finish.embossing", "coverage.inside", "coverage.inside_outside"], "reason": "Film doesn't take decorative finishes or inside printing." }
       ],
       "premiumTierAvailable": false,
-      "premiumTierMessage": "Ten format nie ma wersji premium – dla efektu unboxingu przejdź do pudełka z klapą.",
+      "premiumTierMessage": "This format has no premium tier – for an unboxing effect, try the mailer box.",
       "assets": { "photo": "/photos/poly_mailer.jpg", "photoSource": "packhelp", "aspect": 0.8, "fallback": "/schematics/poly_mailer.svg" }
     },
 
     {
       "id": "paper_mailer",
-      "label": "Kurierka papierowa",
-      "story": "To samo co foliowa, ale z papieru. Dla marek, którym eco musi być widoczne od zewnątrz.",
+      "label": "Paper mailer",
+      "story": "Same as the poly mailer, but paper. For brands where eco needs to be visible from the outside.",
       "channels": ["courier", "parcel_locker"],
       "protection": "low",
       "moq": 30,
@@ -320,7 +320,7 @@
       "assetTier": "placeholder",
       "priceCurve": {
         "source": "mocked",
-        "note": "Papier z warstwą ochronną; ok. 2× drożej niż folia",
+        "note": "Paper with a protective layer; roughly 2x the price of film",
         "points": [
           { "qty": 30, "unit": 1.05 }, { "qty": 120, "unit": 0.52 }, { "qty": 500, "unit": 0.30 },
           { "qty": 1000, "unit": 0.26 }, { "qty": 2000, "unit": 0.24 }
@@ -335,17 +335,17 @@
         "material.kraft", "material.white", "closure.single_strip", "closure.double_strip"
       ],
       "constraints": [
-        { "if": ["*"], "forbid": ["finish.matte_foil", "finish.glossy_foil"], "reason": "Foliowanie unieważnia kompostowalność tego formatu." }
+        { "if": ["*"], "forbid": ["finish.matte_foil", "finish.glossy_foil"], "reason": "Foiling would void this format's compostability." }
       ],
       "premiumTierAvailable": false,
-      "premiumTierMessage": "Ten format nie ma wersji premium – jeśli zależy Ci na efekcie, sprawdź pudełko z klapą.",
+      "premiumTierMessage": "This format has no premium tier – if the effect matters to you, check the mailer box.",
       "assets": { "photo": "/photos/paper_mailer.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/paper_mailer.svg" }
     },
 
     {
       "id": "doypack",
-      "label": "Saszetka stojąca",
-      "story": "Doypack – kawa, granola, sypkie. Stoi na półce, zamykana strunowo.",
+      "label": "Stand-up pouch",
+      "story": "Doypack – coffee, granola, loose goods. Stands on a shelf, zip closure.",
       "channels": ["retail_shelf", "hand"],
       "protection": "medium",
       "moq": 250,
@@ -354,7 +354,7 @@
       "assetTier": "placeholder",
       "priceCurve": {
         "source": "mocked",
-        "note": "Laminat barierowy; wysokie MOQ, długi lead time",
+        "note": "Barrier laminate; high MOQ, long lead time",
         "points": [
           { "qty": 250, "unit": 1.10 }, { "qty": 1000, "unit": 0.62 }, { "qty": 2500, "unit": 0.45 }, { "qty": 5000, "unit": 0.38 }
         ]
@@ -373,8 +373,8 @@
 
     {
       "id": "paper_bag",
-      "label": "Torba papierowa",
-      "story": "Do ręki, w sklepie. Nosi się ją po mieście – najtańszy nośnik marki, jaki masz.",
+      "label": "Paper bag",
+      "story": "Carried by hand, in-store. Walks around town – the cheapest brand carrier you'll ever get.",
       "channels": ["hand", "retail_shelf", "gift"],
       "protection": "low",
       "moq": 30,
@@ -382,7 +382,7 @@
       "assetTier": "placeholder",
       "priceCurve": {
         "source": "mocked",
-        "note": "Wliczone uchwyty; przy dużym nakładzie sznurek staje się główną składową",
+        "note": "Handles included; at high volumes the cord becomes the main cost driver",
         "points": [
           { "qty": 30, "unit": 1.85 }, { "qty": 120, "unit": 0.98 }, { "qty": 500, "unit": 0.62 },
           { "qty": 1000, "unit": 0.55 }, { "qty": 2000, "unit": 0.52 }
@@ -402,8 +402,8 @@
 
     {
       "id": "ziplock",
-      "label": "Woreczek strunowy",
-      "story": "Najtańsza rzecz w katalogu. Drobiazgi, akcesoria, próbki, części zamienne.",
+      "label": "Zip-lock bag",
+      "story": "The cheapest thing in the catalogue. Small items, accessories, samples, spare parts.",
       "channels": ["hand", "retail_shelf", "courier"],
       "protection": "low",
       "moq": 100,
@@ -411,7 +411,7 @@
       "assetTier": "placeholder",
       "priceCurve": {
         "source": "mocked",
-        "note": "Najniższy próg cenowy w katalogu",
+        "note": "The lowest price floor in the catalogue",
         "points": [
           { "qty": 100, "unit": 0.35 }, { "qty": 500, "unit": 0.16 }, { "qty": 1000, "unit": 0.12 },
           { "qty": 2000, "unit": 0.10 }, { "qty": 5000, "unit": 0.08 }
@@ -423,10 +423,10 @@
       "sizeMultiplier": { "S": 1.00, "M": 1.28, "L": 1.60 },
       "allowedModifiers": ["print.none", "print.one_colour", "print.multicolour_muted", "coverage.outside"],
       "constraints": [
-        { "if": ["*"], "forbid": ["finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping", "finish.embossing"], "reason": "Format bez opcji wykończeń." }
+        { "if": ["*"], "forbid": ["finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping", "finish.embossing"], "reason": "No finish options on this format." }
       ],
       "premiumTierAvailable": false,
-      "premiumTierMessage": "Ten format nie ma wersji premium – to opakowanie funkcjonalne, nie prezentacyjne.",
+      "premiumTierMessage": "This format has no premium tier – it's functional packaging, not presentational.",
       "assets": { "photo": "/photos/ziplock.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/ziplock.svg" }
     }
   ]

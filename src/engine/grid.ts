@@ -59,25 +59,25 @@ export function buildGrid(slots: Slots, filter: GridFilter = 'all'): DirectionCa
     if (!price.valid) {
       const modifierMoqs = direction.modifiers.map((m) => modifierLibrary[m]?.minQty ?? 0)
       const minQty = Math.max(archetype.moq, ...modifierMoqs)
-      badges.push({ kind: 'moq_gate', label: `Od ${minQty} szt.` })
-      if (archetype.priceCurve.source === 'mocked') badges.push({ kind: 'mocked_price', label: 'Cena orientacyjna' })
+      badges.push({ kind: 'moq_gate', label: `From ${minQty} pcs` })
+      if (archetype.priceCurve.source === 'mocked') badges.push({ kind: 'mocked_price', label: 'Estimated price' })
       sortRank = 3
       selectable = false
     } else {
       selectable = true
       if (price.overBudgetPct == null) {
-        badges.push({ kind: 'in_budget', label: 'W budżecie' })
+        badges.push({ kind: 'in_budget', label: 'In budget' })
         sortRank = 0
       } else if (price.upsellAvailable && price.upsellQuantity) {
-        badges.push({ kind: 'over_budget', label: `${formatPct(price.overBudgetPct)} ponad budżet` })
-        badges.push({ kind: 'upsell', label: `Mieści się przy ${price.upsellQuantity} szt.` })
+        badges.push({ kind: 'over_budget', label: `${formatPct(price.overBudgetPct)} over budget` })
+        badges.push({ kind: 'upsell', label: `Fits at ${price.upsellQuantity} pcs` })
         sortRank = 1
       } else {
-        badges.push({ kind: 'over_budget', label: `${formatPct(price.overBudgetPct)} ponad budżet` })
+        badges.push({ kind: 'over_budget', label: `${formatPct(price.overBudgetPct)} over budget` })
         sortRank = 2
       }
       if (badges.length < 2 && archetype.priceCurve.source === 'mocked') {
-        badges.push({ kind: 'mocked_price', label: 'Cena orientacyjna' })
+        badges.push({ kind: 'mocked_price', label: 'Estimated price' })
       }
     }
 

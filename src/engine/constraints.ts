@@ -8,23 +8,23 @@ export interface ValidateResult {
 /** The only source of compatibility decisions — mirrors the validate_configuration tool contract. */
 export function validateConfiguration(archetypeId: string, quantity: number, modifiers: string[]): ValidateResult {
   const archetype = getArchetype(archetypeId)
-  if (!archetype) return { valid: false, reason: 'Nieznany archetyp.' }
+  if (!archetype) return { valid: false, reason: 'Unknown archetype.' }
 
   for (const key of modifiers) {
     if (!archetype.allowedModifiers.includes(key)) {
       const label = modifierLibrary[key]?.label ?? key
-      return { valid: false, reason: `${label} nie jest dostępny(a) dla formatu „${archetype.label}".` }
+      return { valid: false, reason: `${label} isn't available for the "${archetype.label}" format.` }
     }
   }
 
   if (quantity < archetype.moq) {
-    return { valid: false, reason: `Minimalny nakład dla tego formatu to ${archetype.moq} szt.` }
+    return { valid: false, reason: `The minimum quantity for this format is ${archetype.moq} pcs.` }
   }
 
   for (const key of modifiers) {
     const mod = modifierLibrary[key]
     if (mod?.minQty && quantity < mod.minQty) {
-      return { valid: false, reason: `${mod.label} wymaga nakładu min. ${mod.minQty} szt.` }
+      return { valid: false, reason: `${mod.label} needs a minimum quantity of ${mod.minQty} pcs.` }
     }
   }
 

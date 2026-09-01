@@ -93,8 +93,8 @@ export function Chat() {
       window.setTimeout(() => {
         pushAssistant(
           status.complete
-            ? 'Nie jestem pewien, co masz na myśli — możesz podać nakład, budżet albo styl (np. minimal, eco, lux)?'
-            : 'Nie jestem pewien, co masz na myśli — możesz też kliknąć jedną z opcji poniżej.',
+            ? "I'm not sure what you mean — you could give me a quantity, a budget, or a style (e.g. minimal, eco, lux)?"
+            : "I'm not sure what you mean — you can also just click one of the options below.",
         )
       }, 250)
       return
@@ -142,7 +142,7 @@ export function Chat() {
       )}
 
       <form
-        className="mx-auto flex w-full max-w-2xl flex-none flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl"
+        className="flex w-full flex-none flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl"
         onSubmit={(e) => {
           e.preventDefault()
           handleSend(input)
@@ -159,16 +159,16 @@ export function Chat() {
           }}
           placeholder={
             isFresh
-              ? 'Opisz, co pakujesz...'
+              ? "Describe what you're packing..."
               : status.complete
-                ? 'np. Zwiększ nakład do 250 albo chcę eco'
-                : 'albo po prostu wpisz, np. kosmetyki, 60x120x60...'
+                ? 'e.g. Increase the quantity to 250, or I want eco'
+                : 'or just type it, e.g. cosmetics, 60x120x60...'
           }
           rows={2}
           className="min-h-16 resize-none border-none bg-transparent px-1 text-base shadow-none focus-visible:ring-0"
         />
         <div className="flex items-center justify-between">
-          <Button type="button" variant="ghost" size="icon" disabled title="Wkrótce" className="size-9 rounded-full text-muted-foreground">
+          <Button type="button" variant="ghost" size="icon" disabled title="Coming soon" className="size-9 rounded-full text-muted-foreground">
             <Plus size={18} strokeWidth={1.75} />
           </Button>
 
@@ -178,7 +178,7 @@ export function Chat() {
               variant="ghost"
               size="icon"
               disabled={!dictation.supported}
-              title={dictation.supported ? 'Dyktuj' : 'Dyktowanie niedostępne w tej przeglądarce'}
+              title={dictation.supported ? 'Dictate' : "Dictation isn't available in this browser"}
               onClick={dictation.toggle}
               className={cn(
                 'size-9 rounded-full text-muted-foreground',

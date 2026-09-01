@@ -17,7 +17,7 @@ export function Grid() {
 
       {state.cards.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          Żaden kierunek nie pasuje przy tym filtrze — spróbuj „Wszystkie".
+          No direction matches this filter — try "All".
         </p>
       ) : (
         <div className="flex gap-3">

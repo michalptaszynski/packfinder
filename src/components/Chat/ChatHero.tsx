@@ -38,15 +38,15 @@ export function ChatHero() {
   return (
     <div className="flex flex-1 flex-col gap-7 overflow-y-auto pr-1">
       <div>
-        <h2 className="text-4xl font-light tracking-tight text-balance">Znajdź opakowanie</h2>
+        <h2 className="text-4xl font-light tracking-tight text-balance">Find your packaging</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Powiedz mi, co pakujesz, a pokażę pasujące kierunki. Albo wybierz jedną z opcji poniżej.
+          Tell me what you're packing and I'll show you matching directions. Or pick one of the options below.
         </p>
       </div>
 
       <div className="flex flex-col gap-3">
         <CarouselHeader
-          title="Główne kategorie"
+          title="Main categories"
           canScrollLeft={mainCanScrollLeft}
           canScrollRight={mainCanScrollRight}
           onScrollLeft={() => mainScrollBy(-1)}
@@ -64,7 +64,7 @@ export function ChatHero() {
 
       <div className="flex flex-col gap-3">
         <CarouselHeader
-          title="Więcej kategorii"
+          title="More categories"
           canScrollLeft={restCanScrollLeft}
           canScrollRight={restCanScrollRight}
           onScrollLeft={() => restScrollBy(-1)}

@@ -86,12 +86,12 @@ export function Handoff() {
     <Dialog open={open} onOpenChange={(next) => !next && dispatch({ type: 'BACK_TO_CONVERSATION' })}>
       <DialogContent className="max-h-[85vh] gap-0 overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Podgląd edytora (mock)</DialogTitle>
-          <DialogDescription>Wybrany kierunek trafia do edytora z pełną konfiguracją i paskiem budżetu.</DialogDescription>
+          <DialogTitle>Editor preview (mock)</DialogTitle>
+          <DialogDescription>The chosen direction goes to the editor with the full configuration and a budget bar.</DialogDescription>
         </DialogHeader>
 
         {!direction || !archetype || !card || !price?.valid ? (
-          <p className="p-4 text-sm text-muted-foreground">Nie wybrano jeszcze kierunku.</p>
+          <p className="p-4 text-sm text-muted-foreground">No direction has been chosen yet.</p>
         ) : (
           <div className="flex flex-col gap-5 px-1 pb-2">
             {budgetTotal !== undefined && (
@@ -104,7 +104,7 @@ export function Handoff() {
                   <div className="absolute -top-0.5 h-3 w-0.5 bg-muted-foreground" style={{ left: `${markerPct}%` }} />
                 </div>
                 <span className="whitespace-nowrap text-xs tabular-nums">
-                  {formatMoney(total)} {overBudget ? `(${formatMoney(total - budgetTotal)} ponad budżet)` : `z ${formatMoney(budgetTotal)}`}
+                  {formatMoney(total)} {overBudget ? `(${formatMoney(total - budgetTotal)} over budget)` : `of ${formatMoney(budgetTotal)}`}
                 </span>
               </div>
             )}
@@ -127,9 +127,9 @@ export function Handoff() {
 
             <div className="rounded-lg border border-border bg-muted/50">
               <div className="flex items-center justify-between border-b border-border px-3 py-2 text-xs text-muted-foreground">
-                <span>Payload do edytora</span>
+                <span>Editor payload</span>
                 <Button size="sm" variant="outline" onClick={copyPayload}>
-                  {copied ? 'Skopiowano' : 'Kopiuj JSON'}
+                  {copied ? 'Copied' : 'Copy JSON'}
                 </Button>
               </div>
               <pre className="max-h-72 overflow-auto p-3 text-xs leading-relaxed">{JSON.stringify(payload, null, 2)}</pre>

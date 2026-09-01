@@ -2,119 +2,119 @@
   {
     "id": "mailer_kraft_1c",
     "archetype": "mailer",
-    "label": "Kraft, druk jednokolorowy",
+    "label": "Kraft, single-colour print",
     "modifiers": ["material.kraft", "print.one_colour", "coverage.outside", "finish.none"],
     "vibeTags": ["minimal", "eco"]
   },
   {
     "id": "mailer_white_premium",
     "archetype": "mailer",
-    "label": "Biały, multicolour premium",
+    "label": "White, premium multicolour",
     "modifiers": ["material.white_both", "print.multicolour_premium", "coverage.inside_outside", "finish.matte_foil"],
     "vibeTags": ["bold", "lux"]
   },
   {
     "id": "shipping_box_kraft",
     "archetype": "shipping_box",
-    "label": "Kraft, bez ozdobników",
+    "label": "Kraft, no embellishments",
     "modifiers": ["material.kraft", "print.one_colour", "coverage.outside", "finish.none"],
     "vibeTags": ["minimal", "eco"]
   },
   {
     "id": "product_box_white_matte",
     "archetype": "product_box",
-    "label": "Biały z folią matową",
+    "label": "White with matte foil",
     "modifiers": ["material.white", "print.one_colour", "coverage.outside", "finish.matte_foil"],
     "vibeTags": ["minimal", "lux"]
   },
   {
     "id": "product_box_saturated",
     "archetype": "product_box",
-    "label": "Nasycony kolor, powlekany",
+    "label": "Saturated colour, coated",
     "modifiers": ["material.coated", "print.multicolour_saturated", "coverage.outside"],
     "vibeTags": ["bold", "playful"]
   },
   {
     "id": "folding_carton_white",
     "archetype": "folding_carton",
-    "label": "Biały, 1 kolor",
+    "label": "White, 1 colour",
     "modifiers": ["material.white", "print.one_colour", "coverage.outside", "finish.none"],
     "vibeTags": ["minimal"]
   },
   {
     "id": "folding_carton_bold",
     "archetype": "folding_carton",
-    "label": "Multicolour nasycony, folia błyszcząca",
+    "label": "Saturated multicolour, gloss foil",
     "modifiers": ["material.coated", "print.multicolour_saturated", "coverage.outside", "finish.glossy_foil"],
     "vibeTags": ["bold", "playful"]
   },
   {
     "id": "rigid_box_matte_black",
     "archetype": "rigid_box",
-    "label": "Czarny, folia matowa",
+    "label": "Black, matte foil",
     "modifiers": ["material.coated", "print.one_colour", "coverage.outside", "finish.matte_foil"],
     "vibeTags": ["lux", "minimal"]
   },
   {
     "id": "rigid_box_premium_gold",
     "archetype": "rigid_box",
-    "label": "Premium ze złoceniem",
+    "label": "Premium with gold foil",
     "modifiers": ["material.white_both", "print.multicolour_premium", "coverage.inside_outside", "finish.hot_stamping"],
     "vibeTags": ["lux", "retro"]
   },
   {
     "id": "drawer_box_kraft",
     "archetype": "drawer_box",
-    "label": "Kraft, 1 kolor",
+    "label": "Kraft, 1 colour",
     "modifiers": ["material.kraft", "print.one_colour", "coverage.outside", "finish.none"],
     "vibeTags": ["minimal", "eco"]
   },
   {
     "id": "tube_kraft",
     "archetype": "tube",
-    "label": "Kraft, 1 kolor",
+    "label": "Kraft, 1 colour",
     "modifiers": ["material.kraft", "print.one_colour", "coverage.outside", "finish.none"],
     "vibeTags": ["eco", "retro"]
   },
   {
     "id": "poly_mailer_plain",
     "archetype": "poly_mailer",
-    "label": "Bez druku",
+    "label": "No print",
     "modifiers": ["print.none", "coverage.outside", "closure.single_strip"],
     "vibeTags": ["minimal"]
   },
   {
     "id": "poly_mailer_branded",
     "archetype": "poly_mailer",
-    "label": "1 kolor na całej folii",
+    "label": "1 colour, full coverage",
     "modifiers": ["print.one_colour", "coverage.outside", "closure.single_strip"],
     "vibeTags": ["bold"]
   },
   {
     "id": "paper_mailer_kraft",
     "archetype": "paper_mailer",
-    "label": "Kraft, 1 kolor",
+    "label": "Kraft, 1 colour",
     "modifiers": ["material.kraft", "print.one_colour", "coverage.outside", "closure.single_strip"],
     "vibeTags": ["eco", "minimal"]
   },
   {
     "id": "doypack_saturated",
     "archetype": "doypack",
-    "label": "Nasycony kolor, folia błyszcząca",
+    "label": "Saturated colour, gloss foil",
     "modifiers": ["print.multicolour_saturated", "coverage.outside", "finish.glossy_foil"],
     "vibeTags": ["bold", "playful"]
   },
   {
     "id": "paper_bag_kraft",
     "archetype": "paper_bag",
-    "label": "Kraft, 1 kolor",
+    "label": "Kraft, 1 colour",
     "modifiers": ["material.kraft", "print.one_colour", "coverage.outside", "finish.none"],
     "vibeTags": ["minimal", "eco"]
   },
   {
     "id": "ziplock_plain",
     "archetype": "ziplock",
-    "label": "Bez druku",
+    "label": "No print",
     "modifiers": ["print.none", "coverage.outside"],
     "vibeTags": ["minimal"]
   }
