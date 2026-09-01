@@ -142,7 +142,7 @@ export function Chat() {
       )}
 
       <form
-        className="flex flex-none flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-sm"
+        className="flex flex-none flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl"
         onSubmit={(e) => {
           e.preventDefault()
           handleSend(input)
@@ -201,14 +201,8 @@ export function Chat() {
 }
 
 function ChatBubble({ message }: { message: ChatMessage }) {
-  return (
-    <div
-      className={cn(
-        'max-w-[92%] rounded-lg px-3.5 py-2.5 text-sm leading-relaxed',
-        message.role === 'user' ? 'self-end bg-state-bg text-state-fg' : 'self-start border border-border bg-card',
-      )}
-    >
-      {message.text}
-    </div>
-  )
+  if (message.role === 'user') {
+    return <div className="max-w-[92%] self-end rounded-full bg-muted px-4 py-2.5 text-sm leading-relaxed text-foreground">{message.text}</div>
+  }
+  return <div className="max-w-[92%] self-start px-1 text-sm leading-relaxed text-foreground">{message.text}</div>
 }
