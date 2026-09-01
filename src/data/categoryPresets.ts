@@ -93,16 +93,13 @@ export const DIMENSION_REFERENCE_CHIPS = [
 ]
 
 export const CHANNEL_OPTIONS: { id: 'courier' | 'parcel_locker' | 'retail_shelf' | 'hand' | 'gift'; label: string; blurb: string }[] = [
-  { id: 'courier', label: 'Kurier', blurb: 'Wysyłka kurierem, klient dostaje paczkę pod drzwi.' },
-  { id: 'parcel_locker', label: 'Paczkomat', blurb: 'Odbiór z automatu paczkowego — liczy się gabaryt.' },
-  { id: 'retail_shelf', label: 'Półka w sklepie', blurb: 'Stoi na półce, klient bierze je sam.' },
-  { id: 'hand', label: 'Do ręki', blurb: 'Wręczane bezpośrednio, np. na evencie albo w punkcie sprzedaży.' },
-  { id: 'gift', label: 'Wysyłka prezentowa', blurb: 'Wysyłane jako gotowy prezent — liczy się pierwsze wrażenie.' },
+  { id: 'courier', label: 'Pudełko wysyłkowe', blurb: 'Jedzie kurierem albo trafia do paczkomatu — priorytet to ochrona w transporcie.' },
+  { id: 'retail_shelf', label: 'Pudełko produktowe', blurb: 'Stoi na półce, w dłoni klienta albo jako prezent — priorytet to wygląd.' },
 ]
 
 export const QUIZ_QUESTIONS = [
   'Co pakujesz?',
-  'Czy to opakowanie trafia do wysyłki, czy stoi na półce?',
+  'Czy to pudełko wysyłkowe, czy produktowe?',
   'Jakie ma wymiary?',
   'Jaki nakład planujesz?',
   'Jaki masz budżet na sztukę?',

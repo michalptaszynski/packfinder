@@ -36,7 +36,7 @@ function Shell() {
           showRightPanel ? 'w-[380px]' : 'w-full',
         )}
       >
-        <div className={cn('mx-auto flex h-full w-full flex-col gap-4 p-5', !showRightPanel && 'max-w-2xl')}>
+        <div className={cn('mx-auto flex h-full w-full flex-col gap-4 p-5', !showRightPanel && 'max-w-[832px]')}>
           <div>
             <img src="/brand/packhelp-logo.svg" alt="Packhelp" className="h-4 w-auto" />
           </div>

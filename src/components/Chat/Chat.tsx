@@ -142,7 +142,7 @@ export function Chat() {
       )}
 
       <form
-        className="flex flex-none flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl"
+        className="mx-auto flex w-full max-w-2xl flex-none flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl"
         onSubmit={(e) => {
           e.preventDefault()
           handleSend(input)
