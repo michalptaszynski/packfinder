@@ -1,0 +1,433 @@
+{
+  "_meta": {
+    "version": "0.1",
+    "currency": "GBP",
+    "displayCurrencyRate": { "EUR": 1.17, "PLN": 5.05 },
+    "priceBasis": "cena jednostkowa netto, konfiguracja bazowa (kraft, druk 1 kolor, zadruk zewnętrzny, bez folii)",
+    "interpolation": "interpolacja logarytmiczna między punktami krzywej; ekstrapolacja zabroniona – poza zakresem zwróć 'get_a_quote'",
+    "sourceLegend": {
+      "observed": "dane zdjęte z packhelp.co.uk – wiarygodne",
+      "mocked": "oszacowanie na potrzeby prototypu – NIE pokazywać jako wiążącej wyceny"
+    },
+    "uiRule": "archetypy o source='mocked' renderują badge 'cena orientacyjna' przy każdej kwocie",
+    "photoPolicy": "cztery główne archetypy: własna fotografia Packhelp; reszta: Unsplash/Pexels po stałych ID. Spójny rejestr: jedno opakowanie w kadrze, czyste tło, minimalny nadruk, światło studyjne."
+  },
+
+  "modifierLibrary": {
+    "print.none":                  { "label": "Bez druku",                 "unitDelta": 0.00 },
+    "print.one_colour":             { "label": "1 kolor",                   "unitDelta": 0.00 },
+    "print.white_uv":               { "label": "Biały UV",                  "unitMultiplier": 1.15 },
+    "print.multicolour_muted":      { "label": "Multicolour stonowany",     "unitDelta": 0.09 },
+    "print.multicolour_saturated":  { "label": "Multicolour nasycony",      "unitDelta": 0.18 },
+    "print.multicolour_premium":    { "label": "Multicolour premium",       "unitDelta": 0.31, "minQty": 120 },
+    "coverage.outside":             { "label": "Zadruk zewnętrzny",         "unitMultiplier": 1.00 },
+    "coverage.inside":              { "label": "Zadruk wewnętrzny",         "unitMultiplier": 1.12 },
+    "coverage.inside_outside":      { "label": "Zadruk obustronny",         "unitMultiplier": 1.22 },
+    "material.kraft":               { "label": "Kraft",                     "unitMultiplier": 1.00, "eco": true },
+    "material.white":               { "label": "Biały",                     "unitMultiplier": 1.06, "eco": true },
+    "material.white_both":          { "label": "Biały dwustronnie",         "unitMultiplier": 1.14, "eco": true },
+    "material.coated":              { "label": "Powlekany",                 "unitMultiplier": 1.20, "eco": false },
+    "finish.none":                  { "label": "Bez wykończenia",           "unitDelta": 0.00 },
+    "finish.matte_foil":            { "label": "Folia matowa",              "unitMultiplier": 1.18, "breaksEco": true },
+    "finish.glossy_foil":           { "label": "Folia błyszcząca",          "unitMultiplier": 1.18, "breaksEco": true },
+    "finish.hot_stamping":          { "label": "Hot stamping",              "unitDelta": 0.42, "minQty": 120 },
+    "finish.embossing":             { "label": "Tłoczenie",                 "unitDelta": 0.35, "minQty": 120 },
+    "closure.none":                 { "label": "Bez paska",                 "unitDelta": 0.00 },
+    "closure.single_strip":         { "label": "Pasek klejowy",             "unitDelta": 0.04 },
+    "closure.double_strip":         { "label": "Podwójny pasek (zwroty)",   "unitDelta": 0.07 }
+  },
+
+  "addons": {
+    "tissue_paper":   { "label": "Bibułka z nadrukiem",       "minQty": 30,  "unitDelta": 0.12, "source": "mocked" },
+    "branded_tape":   { "label": "Taśma brandowana",          "minQty": 36,  "unitDelta": 0.06, "source": "mocked" },
+    "stickers":       { "label": "Naklejki",                  "minQty": 250, "unitDelta": 0.05, "source": "mocked" },
+    "insert":         { "label": "Insert / wypraska",         "minQty": 240, "unitDelta": 0.28, "source": "mocked" },
+    "thank_you_card": { "label": "Karta z podziękowaniem",    "minQty": 30,  "unitDelta": 0.09, "source": "mocked" },
+    "void_fill":      { "label": "Wypełniacz",                "minQty": 1,   "unitDelta": 0.03, "source": "mocked" }
+  },
+
+  "archetypes": [
+    {
+      "id": "mailer",
+      "label": "Pudełko z klapą",
+      "story": "Klasyk e-commerce. Otwiera się jak książka – najlepszy stosunek efektu unboxingu do ceny.",
+      "channels": ["courier", "parcel_locker", "gift"],
+      "protection": "medium",
+      "moq": 30,
+      "leadTimeDays": 8,
+      "assetTier": "full",
+      "priceCurve": {
+        "source": "observed",
+        "note": "Custom Mailer Box F23 (9,2 × 9,2 × 5 cm), kraft, 1 kolor, zadruk zewnętrzny",
+        "points": [
+          { "qty": 30, "unit": 1.58 }, { "qty": 60, "unit": 1.03 }, { "qty": 90, "unit": 0.82 },
+          { "qty": 120, "unit": 0.74 }, { "qty": 240, "unit": 0.52 }, { "qty": 500, "unit": 0.40 },
+          { "qty": 750, "unit": 0.36 }, { "qty": 1000, "unit": 0.34 }, { "qty": 2000, "unit": 0.34 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [92, 92, 50], "fits": ["InPost A", "Royal Mail Small", "DPD S"] },
+        { "code": "M", "mm": [350, 260, 100], "fits": ["InPost B", "DPD M"] },
+        { "code": "L", "mm": [364, 314, 125], "fits": ["InPost C"] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 2.35, "L": 2.90 },
+      "allowedModifiers": [
+        "print.one_colour", "print.white_uv", "print.multicolour_muted", "print.multicolour_saturated", "print.multicolour_premium",
+        "coverage.outside", "coverage.inside", "coverage.inside_outside",
+        "material.kraft", "material.white", "material.white_both", "material.coated",
+        "finish.none", "finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping",
+        "closure.none", "closure.single_strip", "closure.double_strip"
+      ],
+      "constraints": [
+        { "if": ["print.multicolour_muted"], "forbid": ["coverage.inside", "coverage.inside_outside"], "reason": "Druk stonowany nie obsługuje zadruku tła ani wnętrza." },
+        { "if": ["print.multicolour_saturated"], "forbid": ["coverage.inside"], "reason": "Nasycony druk nie jest dostępny wyłącznie na wnętrzu." },
+        { "if": ["print.multicolour_premium", "coverage.inside_outside"], "require": ["material.white_both"], "reason": "Premium obustronnie wymaga materiału białego z obu stron." }
+      ],
+      "assets": { "photo": "/photos/mailer.jpg", "photoSource": "packhelp", "aspect": 0.8, "fallback": "/schematics/mailer.svg" }
+    },
+
+    {
+      "id": "shipping_box",
+      "label": "Karton wysyłkowy",
+      "story": "Prosty, mocny, do rzeczy cięższych. Mniej o efekt, bardziej o to, żeby dojechało.",
+      "channels": ["courier"],
+      "protection": "high",
+      "moq": 80,
+      "leadTimeDays": 8,
+      "assetTier": "placeholder",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Skalowane z krzywej mailera: więcej materiału, mniej wykrojnika, ~1,08× przy niskim nakładzie",
+        "points": [
+          { "qty": 80, "unit": 1.02 }, { "qty": 240, "unit": 0.58 }, { "qty": 500, "unit": 0.44 },
+          { "qty": 1000, "unit": 0.38 }, { "qty": 2000, "unit": 0.36 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [200, 150, 100] }, { "code": "M", "mm": [300, 220, 150] }, { "code": "L", "mm": [400, 300, 250] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.55, "L": 2.30 },
+      "allowedModifiers": [
+        "print.none", "print.one_colour", "print.multicolour_muted",
+        "coverage.outside", "material.kraft", "material.white",
+        "finish.none", "closure.single_strip", "closure.double_strip"
+      ],
+      "constraints": [
+        { "if": ["*"], "forbid": ["finish.hot_stamping", "finish.embossing"], "reason": "Tektura falista transportowa nie przyjmuje wykończeń zdobniczych." }
+      ],
+      "assets": { "photo": "/photos/shipping_box.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/shipping_box.svg" }
+    },
+
+    {
+      "id": "product_box",
+      "label": "Pudełko produktowe",
+      "story": "Zamykane na zatrzask, stoi na półce. Do kosmetyków, suplementów, świec.",
+      "channels": ["retail_shelf", "hand", "gift"],
+      "protection": "low",
+      "moq": 30,
+      "leadTimeDays": 9,
+      "assetTier": "placeholder",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Karton lity, lżejszy niż falisty, droższy wykrojnik przy małym nakładzie",
+        "points": [
+          { "qty": 30, "unit": 1.24 }, { "qty": 120, "unit": 0.58 }, { "qty": 500, "unit": 0.30 },
+          { "qty": 1000, "unit": 0.26 }, { "qty": 2000, "unit": 0.24 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [60, 60, 100] }, { "code": "M", "mm": [90, 90, 150] }, { "code": "L", "mm": [140, 100, 200] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.45, "L": 2.05 },
+      "allowedModifiers": [
+        "print.one_colour", "print.multicolour_muted", "print.multicolour_saturated", "print.multicolour_premium",
+        "coverage.outside", "coverage.inside_outside", "material.white", "material.coated",
+        "finish.none", "finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping", "finish.embossing"
+      ],
+      "constraints": [],
+      "assets": { "photo": "/photos/product_box.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/product_box.svg" }
+    },
+
+    {
+      "id": "folding_carton",
+      "label": "Kartonik składany",
+      "story": "Najtańszy sposób na porządne pudełko przy większym nakładzie. Płaski w transporcie.",
+      "channels": ["retail_shelf", "hand"],
+      "protection": "low",
+      "moq": 30,
+      "leadTimeDays": 9,
+      "assetTier": "full",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Najtańsza konstrukcja kartonowa; bardzo stroma krzywa skali",
+        "points": [
+          { "qty": 30, "unit": 1.10 }, { "qty": 120, "unit": 0.46 }, { "qty": 500, "unit": 0.20 },
+          { "qty": 1000, "unit": 0.16 }, { "qty": 2000, "unit": 0.14 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [50, 30, 120] }, { "code": "M", "mm": [80, 50, 160] }, { "code": "L", "mm": [120, 80, 220] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.40, "L": 1.95 },
+      "allowedModifiers": [
+        "print.one_colour", "print.multicolour_muted", "print.multicolour_saturated", "print.multicolour_premium",
+        "coverage.outside", "material.white", "material.coated",
+        "finish.none", "finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping"
+      ],
+      "constraints": [
+        { "if": ["*"], "forbid": ["coverage.inside_outside"], "reason": "Ten format drukujemy tylko od zewnątrz." }
+      ],
+      "assets": { "photo": "/photos/folding_carton.jpg", "photoSource": "packhelp", "aspect": 0.8, "fallback": "/schematics/folding_carton.svg" }
+    },
+
+    {
+      "id": "rigid_box",
+      "label": "Pudełko sztywne",
+      "story": "Ciężkie, magnetyczne, otwiera się z oporem. To jest ta półka, na której klient czuje, że kupił coś drogiego.",
+      "channels": ["gift", "retail_shelf", "hand"],
+      "protection": "high",
+      "moq": 120,
+      "leadTimeDays": 18,
+      "assetTier": "full",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Konstrukcja ręcznie kaszerowana; płaska krzywa – skala pomaga słabo",
+        "points": [
+          { "qty": 120, "unit": 3.80 }, { "qty": 250, "unit": 3.20 }, { "qty": 500, "unit": 2.90 },
+          { "qty": 1000, "unit": 2.55 }, { "qty": 2000, "unit": 2.40 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [150, 100, 50] }, { "code": "M", "mm": [230, 160, 70] }, { "code": "L", "mm": [320, 240, 90] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.50, "L": 2.10 },
+      "allowedModifiers": [
+        "print.one_colour", "print.multicolour_premium",
+        "coverage.outside", "coverage.inside_outside",
+        "material.white_both", "material.coated",
+        "finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping", "finish.embossing"
+      ],
+      "constraints": [
+        { "if": ["*"], "forbid": ["material.kraft"], "reason": "Ten format występuje wyłącznie na materiałach kaszerowanych." }
+      ],
+      "assets": { "photo": "/photos/rigid_box.jpg", "photoSource": "packhelp", "aspect": 0.8, "fallback": "/schematics/rigid_box.svg" }
+    },
+
+    {
+      "id": "drawer_box",
+      "label": "Pudełko szufladkowe",
+      "story": "Wysuwa się jak zapałki. Małe, prezentowe – biżuteria, skarpetki, kosmetyk.",
+      "channels": ["gift", "hand", "retail_shelf"],
+      "protection": "medium",
+      "moq": 30,
+      "leadTimeDays": 12,
+      "assetTier": "placeholder",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Dwuelementowa konstrukcja – droższa niż snap lock, tańsza niż rigid",
+        "points": [
+          { "qty": 30, "unit": 1.90 }, { "qty": 120, "unit": 0.95 }, { "qty": 500, "unit": 0.55 },
+          { "qty": 1000, "unit": 0.47 }, { "qty": 2000, "unit": 0.44 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [80, 60, 25] }, { "code": "M", "mm": [120, 90, 35] }, { "code": "L", "mm": [180, 130, 45] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.42, "L": 1.95 },
+      "allowedModifiers": [
+        "print.one_colour", "print.multicolour_muted", "print.multicolour_premium",
+        "coverage.outside", "coverage.inside_outside",
+        "material.kraft", "material.white", "material.coated",
+        "finish.none", "finish.matte_foil", "finish.hot_stamping", "finish.embossing"
+      ],
+      "constraints": [],
+      "assets": { "photo": "/photos/drawer_box.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/drawer_box.svg" }
+    },
+
+    {
+      "id": "tube",
+      "label": "Tuba kartonowa",
+      "story": "Do wszystkiego, co jest okrągłe albo zwinięte. Plakaty, butelka, świeca, kawa.",
+      "channels": ["courier", "gift", "retail_shelf"],
+      "protection": "high",
+      "moq": 30,
+      "leadTimeDays": 12,
+      "assetTier": "placeholder",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Nawijana konstrukcja + wieczko; droga jednostkowo, słaba ekonomia skali",
+        "points": [
+          { "qty": 30, "unit": 2.40 }, { "qty": 120, "unit": 1.30 }, { "qty": 500, "unit": 0.80 },
+          { "qty": 1000, "unit": 0.70 }, { "qty": 2000, "unit": 0.66 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [60, 60, 120] }, { "code": "M", "mm": [90, 90, 220] }, { "code": "L", "mm": [110, 110, 350] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.48, "L": 2.10 },
+      "allowedModifiers": [
+        "print.one_colour", "print.multicolour_muted", "print.multicolour_premium",
+        "coverage.outside", "material.kraft", "material.white",
+        "finish.none", "finish.matte_foil", "finish.hot_stamping"
+      ],
+      "constraints": [
+        { "if": ["*"], "forbid": ["coverage.inside", "coverage.inside_outside"], "reason": "Wnętrze tuby nie jest zadrukowywane." }
+      ],
+      "assets": { "photo": "/photos/tube.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/tube.svg" }
+    },
+
+    {
+      "id": "poly_mailer",
+      "label": "Kurierka foliowa",
+      "story": "Najtańsza wysyłka, jaka istnieje. Lekka, wodoodporna, do rzeczy miękkich.",
+      "channels": ["courier", "parcel_locker"],
+      "protection": "low",
+      "moq": 100,
+      "leadTimeDays": 10,
+      "assetTier": "full",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Druk fleksograficzny na folii; bardzo niska cena jednostkowa",
+        "points": [
+          { "qty": 100, "unit": 0.42 }, { "qty": 500, "unit": 0.19 }, { "qty": 1000, "unit": 0.15 },
+          { "qty": 2000, "unit": 0.12 }, { "qty": 5000, "unit": 0.09 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [250, 350, 0] }, { "code": "M", "mm": [350, 450, 0] }, { "code": "L", "mm": [450, 550, 0] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.35, "L": 1.75 },
+      "allowedModifiers": [
+        "print.none", "print.one_colour", "print.multicolour_muted",
+        "coverage.outside", "closure.single_strip", "closure.double_strip"
+      ],
+      "constraints": [
+        { "if": ["*"], "forbid": ["finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping", "finish.embossing", "coverage.inside", "coverage.inside_outside"], "reason": "Folia nie przyjmuje wykończeń zdobniczych ani zadruku wnętrza." }
+      ],
+      "premiumTierAvailable": false,
+      "premiumTierMessage": "Ten format nie ma wersji premium – dla efektu unboxingu przejdź do pudełka z klapą.",
+      "assets": { "photo": "/photos/poly_mailer.jpg", "photoSource": "packhelp", "aspect": 0.8, "fallback": "/schematics/poly_mailer.svg" }
+    },
+
+    {
+      "id": "paper_mailer",
+      "label": "Kurierka papierowa",
+      "story": "To samo co foliowa, ale z papieru. Dla marek, którym eco musi być widoczne od zewnątrz.",
+      "channels": ["courier", "parcel_locker"],
+      "protection": "low",
+      "moq": 30,
+      "leadTimeDays": 9,
+      "assetTier": "placeholder",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Papier z warstwą ochronną; ok. 2× drożej niż folia",
+        "points": [
+          { "qty": 30, "unit": 1.05 }, { "qty": 120, "unit": 0.52 }, { "qty": 500, "unit": 0.30 },
+          { "qty": 1000, "unit": 0.26 }, { "qty": 2000, "unit": 0.24 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [250, 350, 0] }, { "code": "M", "mm": [350, 450, 0] }, { "code": "L", "mm": [450, 550, 0] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.32, "L": 1.70 },
+      "allowedModifiers": [
+        "print.one_colour", "print.multicolour_muted", "coverage.outside",
+        "material.kraft", "material.white", "closure.single_strip", "closure.double_strip"
+      ],
+      "constraints": [
+        { "if": ["*"], "forbid": ["finish.matte_foil", "finish.glossy_foil"], "reason": "Foliowanie unieważnia kompostowalność tego formatu." }
+      ],
+      "premiumTierAvailable": false,
+      "premiumTierMessage": "Ten format nie ma wersji premium – jeśli zależy Ci na efekcie, sprawdź pudełko z klapą.",
+      "assets": { "photo": "/photos/paper_mailer.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/paper_mailer.svg" }
+    },
+
+    {
+      "id": "doypack",
+      "label": "Saszetka stojąca",
+      "story": "Doypack – kawa, granola, sypkie. Stoi na półce, zamykana strunowo.",
+      "channels": ["retail_shelf", "hand"],
+      "protection": "medium",
+      "moq": 250,
+      "leadTimeDays": 21,
+      "foodSafe": true,
+      "assetTier": "placeholder",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Laminat barierowy; wysokie MOQ, długi lead time",
+        "points": [
+          { "qty": 250, "unit": 1.10 }, { "qty": 1000, "unit": 0.62 }, { "qty": 2500, "unit": 0.45 }, { "qty": 5000, "unit": 0.38 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [110, 180, 60] }, { "code": "M", "mm": [140, 230, 80] }, { "code": "L", "mm": [180, 290, 100] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.30, "L": 1.65 },
+      "allowedModifiers": [
+        "print.one_colour", "print.multicolour_saturated", "print.multicolour_premium",
+        "coverage.outside", "finish.matte_foil", "finish.glossy_foil"
+      ],
+      "constraints": [],
+      "assets": { "photo": "/photos/doypack.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/doypack.svg" }
+    },
+
+    {
+      "id": "paper_bag",
+      "label": "Torba papierowa",
+      "story": "Do ręki, w sklepie. Nosi się ją po mieście – najtańszy nośnik marki, jaki masz.",
+      "channels": ["hand", "retail_shelf", "gift"],
+      "protection": "low",
+      "moq": 30,
+      "leadTimeDays": 11,
+      "assetTier": "placeholder",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Wliczone uchwyty; przy dużym nakładzie sznurek staje się główną składową",
+        "points": [
+          { "qty": 30, "unit": 1.85 }, { "qty": 120, "unit": 0.98 }, { "qty": 500, "unit": 0.62 },
+          { "qty": 1000, "unit": 0.55 }, { "qty": 2000, "unit": 0.52 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [180, 220, 80] }, { "code": "M", "mm": [240, 320, 100] }, { "code": "L", "mm": [320, 400, 120] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.38, "L": 1.85 },
+      "allowedModifiers": [
+        "print.one_colour", "print.multicolour_muted", "print.multicolour_saturated", "coverage.outside",
+        "material.kraft", "material.white", "finish.none", "finish.matte_foil", "finish.hot_stamping"
+      ],
+      "constraints": [],
+      "assets": { "photo": "/photos/paper_bag.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/paper_bag.svg" }
+    },
+
+    {
+      "id": "ziplock",
+      "label": "Woreczek strunowy",
+      "story": "Najtańsza rzecz w katalogu. Drobiazgi, akcesoria, próbki, części zamienne.",
+      "channels": ["hand", "retail_shelf", "courier"],
+      "protection": "low",
+      "moq": 100,
+      "leadTimeDays": 10,
+      "assetTier": "placeholder",
+      "priceCurve": {
+        "source": "mocked",
+        "note": "Najniższy próg cenowy w katalogu",
+        "points": [
+          { "qty": 100, "unit": 0.35 }, { "qty": 500, "unit": 0.16 }, { "qty": 1000, "unit": 0.12 },
+          { "qty": 2000, "unit": 0.10 }, { "qty": 5000, "unit": 0.08 }
+        ]
+      },
+      "sizes": [
+        { "code": "S", "mm": [80, 120, 0] }, { "code": "M", "mm": [120, 170, 0] }, { "code": "L", "mm": [160, 230, 0] }
+      ],
+      "sizeMultiplier": { "S": 1.00, "M": 1.28, "L": 1.60 },
+      "allowedModifiers": ["print.none", "print.one_colour", "print.multicolour_muted", "coverage.outside"],
+      "constraints": [
+        { "if": ["*"], "forbid": ["finish.matte_foil", "finish.glossy_foil", "finish.hot_stamping", "finish.embossing"], "reason": "Format bez opcji wykończeń." }
+      ],
+      "premiumTierAvailable": false,
+      "premiumTierMessage": "Ten format nie ma wersji premium – to opakowanie funkcjonalne, nie prezentacyjne.",
+      "assets": { "photo": "/photos/ziplock.jpg", "photoSource": "stock", "aspect": 0.8, "fallback": "/schematics/ziplock.svg" }
+    }
+  ]
+}

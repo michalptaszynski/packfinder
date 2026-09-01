@@ -1,0 +1,93 @@
+@import 'tailwindcss';
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: 'Geist Variable', sans-serif;
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-border-subtle: var(--border-subtle);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --color-canvas: var(--canvas);
+    --color-fill-hover: var(--fill-hover);
+    --color-state-bg: var(--state-bg);
+    --color-state-fg: var(--state-fg);
+    --color-over-bg: var(--over-bg);
+    --color-over-fg: var(--over-fg);
+    --color-over-bar: var(--over-bar);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+}
+
+:root {
+    /* Section 13 tokens — brief-doradca-opakowan.md */
+    --canvas: #f4f4f3;
+    --panel: #ffffff;
+    --border: #e8e8e6;
+    --border-subtle: #f0f0ee;
+    --text: #1a1a19;
+    --text-muted: #8b8b87;
+    --fill-hover: #f6f6f5;
+    --action: #16181a;
+    --state-bg: #e8f0fd;
+    --state-fg: #1e4fa3;
+    --over-bg: #fdf3e3;
+    --over-fg: #8a5b12;
+    --over-bar: #d9a441;
+
+    /* shadcn semantic slots mapped onto the tokens above */
+    --background: var(--canvas);
+    --foreground: var(--text);
+    --card: var(--panel);
+    --card-foreground: var(--text);
+    --popover: var(--panel);
+    --popover-foreground: var(--text);
+    --primary: var(--action);
+    --primary-foreground: #ffffff;
+    --secondary: var(--fill-hover);
+    --secondary-foreground: var(--text);
+    --muted: var(--border-subtle);
+    --muted-foreground: var(--text-muted);
+    --accent: var(--fill-hover);
+    --accent-foreground: var(--text);
+    --destructive: oklch(0.577 0.245 27.325);
+    --input: var(--border);
+    --ring: var(--state-fg);
+    --radius: 0.625rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
