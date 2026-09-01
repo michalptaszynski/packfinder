@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowUp } from 'lucide-react'
+import { ArrowUp, Mic, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { useDictation } from '@/lib/useDictation'
 import { useSessionDispatch, useSessionState } from '@/state/SessionProvider'
 import { quizStatus } from '@/state/quizStatus'
 import { buildGrid } from '@/engine/grid'
@@ -26,6 +27,7 @@ export function Chat() {
 
   const status = quizStatus(state.slots)
   const isFresh = status.nextStep === 0 && !state.messages.some((m) => m.role === 'user')
+  const dictation = useDictation((transcript) => setInput((prev) => (prev ? `${prev} ${transcript}` : transcript)))
 
   useEffect(() => {
     if (status.complete) {
@@ -165,12 +167,33 @@ export function Chat() {
           rows={2}
           className="min-h-16 resize-none border-none bg-transparent px-1 text-base shadow-none focus-visible:ring-0"
         />
-        <div className="flex justify-end">
-          {input.trim() && (
-            <Button type="submit" size="icon" className="size-9 rounded-full">
-              <ArrowUp size={16} strokeWidth={2.5} />
+        <div className="flex items-center justify-between">
+          <Button type="button" variant="ghost" size="icon" disabled title="Wkrótce" className="size-9 rounded-full text-muted-foreground">
+            <Plus size={18} strokeWidth={1.75} />
+          </Button>
+
+          <div className="flex items-center gap-1.5">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={!dictation.supported}
+              title={dictation.supported ? 'Dyktuj' : 'Dyktowanie niedostępne w tej przeglądarce'}
+              onClick={dictation.toggle}
+              className={cn(
+                'size-9 rounded-full text-muted-foreground',
+                dictation.isListening && 'bg-over-bg text-over-fg animate-pulse hover:bg-over-bg',
+              )}
+            >
+              <Mic size={18} strokeWidth={1.75} />
             </Button>
-          )}
+
+            {input.trim() && (
+              <Button type="submit" size="icon" className="size-9 rounded-full">
+                <ArrowUp size={16} strokeWidth={2.5} />
+              </Button>
+            )}
+          </div>
         </div>
       </form>
     </div>
