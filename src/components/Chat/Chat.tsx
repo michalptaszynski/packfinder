@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { ArrowUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { useSessionDispatch, useSessionState } from '@/state/SessionProvider'
 import { quizStatus } from '@/state/quizStatus'
 import { buildGrid } from '@/engine/grid'
@@ -139,15 +140,21 @@ export function Chat() {
       )}
 
       <form
-        className="flex flex-none items-end gap-2 rounded-2xl border border-border bg-card p-2 shadow-sm"
+        className="flex flex-none flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-sm"
         onSubmit={(e) => {
           e.preventDefault()
           handleSend(input)
         }}
       >
-        <Input
+        <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              handleSend(input)
+            }
+          }}
           placeholder={
             isFresh
               ? 'Opisz, co pakujesz...'
@@ -155,11 +162,16 @@ export function Chat() {
                 ? 'np. Zwiększ nakład do 250 albo chcę eco'
                 : 'albo po prostu wpisz, np. kosmetyki, 60x120x60...'
           }
-          className="h-12 flex-1 rounded-xl border-none bg-transparent px-3 text-base shadow-none focus-visible:ring-0 dark:bg-transparent"
+          rows={2}
+          className="min-h-16 resize-none border-none bg-transparent px-1 text-base shadow-none focus-visible:ring-0"
         />
-        <Button type="submit" disabled={!input.trim()} className="h-12 rounded-xl px-5">
-          Wyślij
-        </Button>
+        <div className="flex justify-end">
+          {input.trim() && (
+            <Button type="submit" size="icon" className="size-9 rounded-full">
+              <ArrowUp size={16} strokeWidth={2.5} />
+            </Button>
+          )}
+        </div>
       </form>
     </div>
   )
