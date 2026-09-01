@@ -11,6 +11,7 @@ import { getArchetype } from '@/engine/pricing'
 import { priceConfiguration } from '@/engine/pricing'
 import type { ChatMessage } from '@/types'
 import { QuizControls } from './QuizControls'
+import { ChatHero } from './ChatHero'
 import { cn } from '@/lib/utils'
 
 export function Chat() {
@@ -23,6 +24,7 @@ export function Chat() {
   const logRef = useRef<HTMLDivElement>(null)
 
   const status = quizStatus(state.slots)
+  const isFresh = status.nextStep === 0 && !state.messages.some((m) => m.role === 'user')
 
   useEffect(() => {
     if (status.complete) {
@@ -105,33 +107,39 @@ export function Chat() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-3">
-      <div ref={logRef} className="flex flex-1 flex-col gap-2.5 overflow-y-auto pr-1">
-        {state.messages.map((message) => (
-          <ChatBubble key={message.id} message={message} />
-        ))}
-      </div>
+    <div className="flex h-full flex-col gap-4">
+      {isFresh ? (
+        <ChatHero />
+      ) : (
+        <>
+          <div ref={logRef} className="flex flex-1 flex-col gap-2.5 overflow-y-auto pr-1">
+            {state.messages.map((message) => (
+              <ChatBubble key={message.id} message={message} />
+            ))}
+          </div>
 
-      {!status.complete && <QuizControls />}
+          {!status.complete && <QuizControls />}
 
-      {state.suggestions.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {state.suggestions.map((suggestion) => (
-            <Button
-              key={suggestion}
-              variant="outline"
-              size="sm"
-              className="rounded-full text-xs font-normal text-muted-foreground"
-              onClick={() => handleSend(suggestion)}
-            >
-              {suggestion}
-            </Button>
-          ))}
-        </div>
+          {state.suggestions.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {state.suggestions.map((suggestion) => (
+                <Button
+                  key={suggestion}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full text-xs font-normal text-muted-foreground"
+                  onClick={() => handleSend(suggestion)}
+                >
+                  {suggestion}
+                </Button>
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <form
-        className="flex gap-2"
+        className="flex flex-none items-end gap-2 rounded-2xl border border-border bg-card p-2 shadow-sm"
         onSubmit={(e) => {
           e.preventDefault()
           handleSend(input)
@@ -140,9 +148,16 @@ export function Chat() {
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={status.complete ? 'np. Zwiększ nakład do 250 albo chcę eco' : 'albo po prostu wpisz, np. kosmetyki, 60x120x60...'}
+          placeholder={
+            isFresh
+              ? 'Opisz, co pakujesz...'
+              : status.complete
+                ? 'np. Zwiększ nakład do 250 albo chcę eco'
+                : 'albo po prostu wpisz, np. kosmetyki, 60x120x60...'
+          }
+          className="h-12 flex-1 rounded-xl border-none bg-transparent px-3 text-base shadow-none focus-visible:ring-0 dark:bg-transparent"
         />
-        <Button type="submit" disabled={!input.trim()}>
+        <Button type="submit" disabled={!input.trim()} className="h-12 rounded-xl px-5">
           Wyślij
         </Button>
       </form>
