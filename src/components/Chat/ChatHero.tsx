@@ -4,7 +4,7 @@ import { useScrollCarousel } from '@/lib/useScrollCarousel'
 import { CarouselHeader } from './CarouselHeader'
 import type { CategoryPreset } from '@/data/categoryPresets'
 
-const FEATURED_ORDER = ['clothing', 'cosmetics', 'gift_set']
+const FEATURED_ORDER = ['clothing', 'cosmetics', 'gift_set', 'bottles', 'food']
 
 /**
  * The empty-state screen shown before the user has answered anything.
@@ -54,8 +54,8 @@ export function ChatHero() {
         />
         <div ref={mainRef} className="flex gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {main.map((preset) => (
-            <button key={preset.id} type="button" onClick={() => pick(preset)} className="flex w-32 flex-none flex-col gap-2 text-left">
-              <div className="aspect-[3/4] rounded-xl bg-muted transition-colors hover:bg-muted/70" />
+            <button key={preset.id} type="button" onClick={() => pick(preset)} className="flex min-w-0 flex-1 flex-col gap-2 text-left">
+              <div className="aspect-[3/4] w-full rounded-xl bg-muted transition-colors hover:bg-muted/70" />
               <span className="text-xs text-muted-foreground">{preset.label}</span>
             </button>
           ))}
