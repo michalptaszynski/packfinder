@@ -3,10 +3,10 @@ import { CATEGORY_PRESETS } from '@/data/categoryPresets'
 import { useSessionDispatch } from '@/state/SessionProvider'
 import type { CategoryPreset } from '@/data/categoryPresets'
 
-const FEATURED: Record<string, { icon: typeof Shirt; blurb: string }> = {
-  clothing: { icon: Shirt, blurb: 'Miękkie opakowanie, które chroni tkaninę i dobrze wygląda przy rozpakowaniu.' },
-  cosmetics: { icon: Sparkles, blurb: 'Małe, eleganckie pudełko dopasowane do słoiczków i tubek.' },
-  gift_set: { icon: Gift, blurb: 'Sztywne albo szufladkowe pudełko z efektem „wow" przy otwieraniu.' },
+const FEATURED_ICON: Record<string, typeof Shirt> = {
+  clothing: Shirt,
+  cosmetics: Sparkles,
+  gift_set: Gift,
 }
 
 const FEATURED_ORDER = ['clothing', 'cosmetics', 'gift_set']
@@ -48,8 +48,7 @@ export function ChatHero() {
 
       <div className="flex flex-col gap-2.5">
         {featured.map((preset) => {
-          const meta = FEATURED[preset.id]
-          const Icon = meta.icon
+          const Icon = FEATURED_ICON[preset.id]
           return (
             <button
               key={preset.id}
@@ -62,7 +61,7 @@ export function ChatHero() {
               </span>
               <span className="flex-1">
                 <span className="block text-sm font-medium">{preset.label}</span>
-                <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{meta.blurb}</span>
+                <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{preset.blurb}</span>
               </span>
               <ChevronRight size={16} className="flex-none text-muted-foreground" />
             </button>
