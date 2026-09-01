@@ -40,7 +40,7 @@ export function ChatHero() {
   return (
     <div className="flex flex-1 flex-col gap-6 overflow-y-auto pr-1">
       <div>
-        <h2 className="text-4xl font-semibold tracking-tight text-balance">Znajdź opakowanie</h2>
+        <h2 className="text-4xl font-light tracking-tight text-balance">Znajdź opakowanie</h2>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
           Powiedz mi, co pakujesz, a pokażę pasujące kierunki. Albo wybierz jedną z opcji poniżej.
         </p>
@@ -56,8 +56,8 @@ export function ChatHero() {
               onClick={() => pick(preset)}
               className="flex items-center gap-3.5 rounded-xl border border-border bg-card p-4 text-left transition-colors hover:border-foreground/20"
             >
-              <span className="flex size-11 flex-none items-center justify-center rounded-lg bg-muted text-foreground">
-                <Icon size={20} strokeWidth={1.5} />
+              <span className="flex size-16 flex-none items-center justify-center rounded-xl bg-muted text-foreground">
+                <Icon size={30} strokeWidth={1.5} />
               </span>
               <span className="flex-1">
                 <span className="block text-sm font-medium">{preset.label}</span>

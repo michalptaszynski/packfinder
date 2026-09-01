@@ -38,8 +38,7 @@ function Shell() {
       >
         <div className={cn('mx-auto flex h-full w-full flex-col gap-4 p-5', !showRightPanel && 'max-w-2xl')}>
           <div>
-            <h1 className="text-lg font-semibold">Packfinder</h1>
-            <p className="text-xs text-muted-foreground">Doradca opakowań</p>
+            <img src="/brand/packhelp-logo.svg" alt="Packhelp" className="h-6 w-auto" />
           </div>
           <Chat />
         </div>
