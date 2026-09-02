@@ -279,8 +279,13 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
             <ChatHero />
           ) : (
             <div className="flex flex-col gap-2.5">
-              {state.messages.map((message) => (
-                <ChatBubble key={message.id} message={message} />
+              {state.messages.map((message, index) => (
+                <ChatBubble
+                  key={message.id}
+                  message={message}
+                  joinAbove={state.messages[index - 1]?.role === message.role}
+                  joinBelow={state.messages[index + 1]?.role === message.role}
+                />
               ))}
               {altQuiz && questionPending && (
                 <QuizControls clarification={clarification} onSend={(text) => void handleSend(text)} altQuiz />
@@ -439,9 +444,32 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
 
 /** Every message slides up as it lands, the same way the answer cards do. */
 const BUBBLE_ENTRANCE = 'animate-in fade-in slide-in-from-bottom-4 duration-300 ease-out'
+/**
+ * Radii for a run of messages from the same side. A tucked corner only reads
+ * as a join when both shapes belong to the same family, so a bubble carrying
+ * an attachment drops the pill shape and takes the attachment's radius; the
+ * corner where the two meet then tucks to 6px.
+ */
+const JOIN_TOP = 'rounded-tr-[6px]'
+const JOIN_BOTTOM = 'rounded-br-[6px]'
 
-function ChatBubble({ message }: { message: ChatMessage }) {
+function ChatBubble({
+  message,
+  joinAbove,
+  joinBelow,
+}: {
+  message: ChatMessage
+  /** The message before this one is from the same side. */
+  joinAbove: boolean
+  /** The message after this one is from the same side. */
+  joinBelow: boolean
+}) {
   if (message.role === 'user') {
+    // An attachment above the text is itself a join, so the bubble's top
+    // corner tucks in whether the neighbour is a sibling message or this
+    // message's own image.
+    const attached = Boolean(message.image || message.dimensions)
+
     return (
       <div className={cn('flex max-w-[92%] flex-col items-end gap-1.5 self-end', BUBBLE_ENTRANCE)}>
         {message.image && (
@@ -450,16 +478,35 @@ function ChatBubble({ message }: { message: ChatMessage }) {
             alt=""
             // Scaled down to fit, never cropped: a fixed box with
             // object-cover was cutting the bottom off portrait shots.
-            className="max-h-72 max-w-60 rounded-xl border border-border"
+            className={cn('max-h-72 max-w-60 rounded-xl border border-border', JOIN_BOTTOM)}
           />
         )}
-        {message.dimensions && <BoxOutline dimensions={message.dimensions} size={96} />}
-        <div className="rounded-full bg-state-bg px-4 py-2.5 text-sm leading-relaxed text-state-fg">{message.text}</div>
+        {message.dimensions && <BoxOutline dimensions={message.dimensions} size={96} className={JOIN_BOTTOM} />}
+        <div
+          className={cn(
+            'bg-user-bg px-4 py-2.5 text-sm leading-relaxed text-user-fg',
+            // A class, not an inline radius: inline styles would beat the
+            // per-corner utility that does the tucking.
+            attached ? 'rounded-[14px]' : 'rounded-full',
+            (attached || joinAbove) && JOIN_TOP,
+            joinBelow && JOIN_BOTTOM,
+          )}
+        >
+          {message.text}
+        </div>
       </div>
     )
   }
+
   return (
-    <div className={cn('max-w-[92%] self-start rounded-2xl bg-muted px-4 py-2.5 text-sm leading-relaxed text-foreground', BUBBLE_ENTRANCE)}>
+    <div
+      className={cn(
+        'max-w-[92%] self-start rounded-2xl bg-muted px-4 py-2.5 text-sm leading-relaxed text-foreground',
+        BUBBLE_ENTRANCE,
+        joinAbove && 'rounded-tl-[6px]',
+        joinBelow && 'rounded-bl-[6px]',
+      )}
+    >
       {message.text}
     </div>
   )

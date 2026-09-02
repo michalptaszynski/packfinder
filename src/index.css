@@ -37,6 +37,8 @@
     --color-over-bg: var(--over-bg);
     --color-over-fg: var(--over-fg);
     --color-over-bar: var(--over-bar);
+    --color-user-bg: var(--user-bg);
+    --color-user-fg: var(--user-fg);
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -59,6 +61,9 @@
     --over-bg: #fdf3e3;
     --over-fg: #8a5b12;
     --over-bar: #d9a441;
+    /* Your own messages: near-black bubble, light type. */
+    --user-bg: #1a1a19;
+    --user-fg: #f3f3f1;
 
     /* shadcn semantic slots mapped onto the tokens above */
     --background: var(--canvas);
@@ -99,6 +104,9 @@
     --over-bg: #3a2e15;
     --over-fg: #e3b463;
     --over-bar: #d9a441;
+    /* Darker than the panel it sits on, so it still reads as "mine". */
+    --user-bg: #0c0c0c;
+    --user-fg: #ededed;
 
     --primary-foreground: #0f1420;
     --destructive: oklch(0.62 0.21 25);

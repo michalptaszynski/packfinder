@@ -3,7 +3,6 @@ import { distributeMasonry } from '@/engine/grid'
 import { useColumnCount } from '@/lib/useColumnCount'
 import { tileHeight } from '@/lib/tileHeights'
 import { DirectionCardTile } from './DirectionCardTile'
-import { GridControls } from './GridControls'
 
 /** Gap between one column landing and the next. */
 const COLUMN_STAGGER_MS = 110
@@ -17,8 +16,6 @@ export function Grid() {
 
   return (
     <div ref={gridRef} className="flex flex-col gap-4">
-      <GridControls />
-
       {state.cards.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
           No direction matches this filter — try "All".
