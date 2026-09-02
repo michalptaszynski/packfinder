@@ -52,8 +52,8 @@ function Shell() {
           </div>
         </div>
 
-        <div className={cn('mx-auto flex w-full min-h-0 flex-1 flex-col gap-4 p-5', !showRightPanel && 'max-w-[832px]')}>
-          <Chat />
+        <div className="relative min-h-0 flex-1">
+          <Chat centered={!showRightPanel} />
         </div>
       </aside>
 

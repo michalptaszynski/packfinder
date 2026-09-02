@@ -16,7 +16,7 @@ import { QuizControls } from './QuizControls'
 import { ChatHero } from './ChatHero'
 import { cn } from '@/lib/utils'
 
-export function Chat() {
+export function Chat({ centered }: { centered: boolean }) {
   const state = useSessionState()
   const dispatch = useSessionDispatch()
   const [input, setInput] = useState('')
@@ -112,43 +112,42 @@ export function Chat() {
 
   return (
     <div className="relative h-full">
-      <div
-        ref={scrollRef}
-        className="absolute inset-0 overflow-y-auto pb-32 pr-1"
-      >
-        {isFresh ? (
-          <ChatHero />
-        ) : (
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2.5">
-              {state.messages.map((message) => (
-                <ChatBubble key={message.id} message={message} />
-              ))}
-            </div>
-
-            {!status.complete && <QuizControls />}
-
-            {state.suggestions.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {state.suggestions.map((suggestion) => (
-                  <Button
-                    key={suggestion}
-                    variant="outline"
-                    size="sm"
-                    className="rounded-full text-xs font-normal text-muted-foreground"
-                    onClick={() => handleSend(suggestion)}
-                  >
-                    {suggestion}
-                  </Button>
+      <div ref={scrollRef} className="absolute inset-0 overflow-y-auto">
+        <div className={cn('mx-auto flex w-full flex-col gap-4 p-5 pb-40', centered && 'max-w-[832px]')}>
+          {isFresh ? (
+            <ChatHero />
+          ) : (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2.5">
+                {state.messages.map((message) => (
+                  <ChatBubble key={message.id} message={message} />
                 ))}
               </div>
-            )}
-          </div>
-        )}
+
+              {!status.complete && <QuizControls />}
+
+              {state.suggestions.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {state.suggestions.map((suggestion) => (
+                    <Button
+                      key={suggestion}
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full text-xs font-normal text-muted-foreground"
+                      onClick={() => handleSend(suggestion)}
+                    >
+                      {suggestion}
+                    </Button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <form
-        className="absolute inset-x-0 bottom-0 flex w-full flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl"
+        className={cn('absolute inset-x-5 bottom-5 mx-auto flex flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl', centered && 'max-w-[832px]')}
         onSubmit={(e) => {
           e.preventDefault()
           handleSend(input)
