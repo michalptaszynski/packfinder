@@ -114,7 +114,7 @@ export function Chat() {
     <div className="relative h-full">
       <div
         ref={scrollRef}
-        className="absolute inset-0 overflow-y-auto pb-32 pr-1 [-webkit-mask-image:linear-gradient(to_bottom,transparent,black_16px,black_calc(100%-16px),transparent)] [mask-image:linear-gradient(to_bottom,transparent,black_16px,black_calc(100%-16px),transparent)]"
+        className="absolute inset-0 overflow-y-auto pb-32 pr-1"
       >
         {isFresh ? (
           <ChatHero />
