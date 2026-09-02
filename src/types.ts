@@ -1,4 +1,8 @@
 export type Channel = 'courier' | 'parcel_locker' | 'retail_shelf' | 'hand' | 'gift'
+/** Refinement answers. 'any' means the question was asked and left open. */
+export type MaterialChoice = 'any' | 'kraft' | 'white' | 'coated'
+export type CoverageChoice = 'any' | 'outside' | 'inside_outside'
+export type StripChoice = 'any' | 'with' | 'without'
 export type Protection = 'low' | 'medium' | 'high'
 export type EcoRequirement = 'none' | 'preferred' | 'required'
 export type Fragility = 'low' | 'medium' | 'high'
@@ -100,6 +104,10 @@ export interface Slots {
   vibe?: SlotMeta<string[]>
   ecoRequirement?: SlotMeta<EcoRequirement>
   foodContact?: SlotMeta<boolean>
+  /* Asked after the grid opens; each one narrows it. */
+  materialColour?: SlotMeta<MaterialChoice>
+  printCoverage?: SlotMeta<CoverageChoice>
+  adhesiveStrip?: SlotMeta<StripChoice>
 }
 
 export interface PriceConfigResult {
@@ -140,4 +148,8 @@ export interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   text: string
+  /** Photo of the picked option, shown above the bubble as an attachment. */
+  image?: string
+  /** Sizes answered on the dimensions step, redrawn above the bubble. */
+  dimensions?: Dimensions
 }

@@ -1,6 +1,6 @@
 import directionsData from '../data/directions.json'
 import { archetypeCatalog, getArchetype, modifierLibrary, pickSizeCode, priceConfiguration } from './pricing'
-import type { Direction, DirectionBadge, DirectionCard, Fragility, GridFilter, Protection, Slots } from '../types'
+import type { CoverageChoice, Direction, DirectionBadge, DirectionCard, Fragility, GridFilter, MaterialChoice, Protection, Slots, StripChoice } from '../types'
 
 export const directionsCatalog = directionsData as Direction[]
 
@@ -14,6 +14,31 @@ function fragilityToProtection(fragility?: Fragility): Protection {
 
 function formatPct(pct: number): string {
   return `+${Math.round(pct)}%`
+}
+
+/**
+ * Refinement answers translated onto the modifier ids a direction carries.
+ * 'any' — and an unanswered question — matches everything, so the grid only
+ * ever narrows on a choice the user actually made.
+ */
+function matchesMaterial(modifiers: string[], choice?: MaterialChoice): boolean {
+  if (!choice || choice === 'any') return true
+  if (choice === 'white') return modifiers.includes('material.white') || modifiers.includes('material.white_both')
+  return modifiers.includes(`material.${choice}`)
+}
+
+function matchesCoverage(modifiers: string[], choice?: CoverageChoice): boolean {
+  if (!choice || choice === 'any') return true
+  return modifiers.includes(`coverage.${choice}`)
+}
+
+function hasStrip(modifiers: string[]): boolean {
+  return modifiers.some((m) => m.startsWith('closure.') && m !== 'closure.none')
+}
+
+function matchesStrip(modifiers: string[], choice?: StripChoice): boolean {
+  if (!choice || choice === 'any') return true
+  return choice === 'with' ? hasStrip(modifiers) : !hasStrip(modifiers)
 }
 
 /**
@@ -42,6 +67,9 @@ export function buildGrid(slots: Slots, filter: GridFilter = 'all'): DirectionCa
     if (foodContactRequired && !archetype.foodSafe) continue
     if (PROTECTION_RANK[archetype.protection] < PROTECTION_RANK[neededProtection]) continue
     if (ecoRequired && direction.modifiers.some((m) => modifierLibrary[m]?.breaksEco)) continue
+    if (!matchesMaterial(direction.modifiers, slots.materialColour?.value)) continue
+    if (!matchesCoverage(direction.modifiers, slots.printCoverage?.value)) continue
+    if (!matchesStrip(direction.modifiers, slots.adhesiveStrip?.value)) continue
 
     const { code: sizeCode } = pickSizeCode(archetype, productMm)
     const price = priceConfiguration({
@@ -102,9 +130,17 @@ function applyFilter(cards: DirectionCard[], filter: GridFilter): DirectionCard[
   }
 }
 
-export function distributeMasonry<T>(items: T[], columns: number): T[][] {
+export function distributeMasonry<T>(items: T[], columns: number, measure?: (item: T) => number): T[][] {
   const cols: T[][] = Array.from({ length: columns }, () => [])
-  items.forEach((item, i) => cols[i % columns].push(item))
+  // Without a measure this stays the old round-robin. With one, each item goes
+  // to whichever column is currently shortest, so staggered tiles still end up
+  // with roughly level column bottoms.
+  const heights = Array.from({ length: columns }, () => 0)
+  items.forEach((item, i) => {
+    const target = measure ? heights.indexOf(Math.min(...heights)) : i % columns
+    cols[target].push(item)
+    if (measure) heights[target] += measure(item)
+  })
   return cols
 }
 

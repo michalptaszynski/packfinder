@@ -1,4 +1,9 @@
 @import 'tailwindcss';
+
+/* Dark mode is a class on <html>, not a media query — the gear menu switches
+   it explicitly. This also points the ui kit's own `dark:` utilities at the
+   same signal. */
+@custom-variant dark (&:where(.dark, .dark *));
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
@@ -41,14 +46,14 @@
 
 :root {
     /* Section 13 tokens — brief-doradca-opakowan.md */
-    --canvas: #f4f4f3;
+    --canvas: #ffffff;
     --panel: #ffffff;
     --border: #e8e8e6;
     --border-subtle: #f0f0ee;
     --text: #1a1a19;
     --text-muted: #8b8b87;
     --fill-hover: #f6f6f5;
-    --action: #16181a;
+    --action: #1e63e9;
     --state-bg: #e8f0fd;
     --state-fg: #1e4fa3;
     --over-bg: #fdf3e3;
@@ -76,6 +81,29 @@
     --radius: 0.625rem;
 }
 
+/* Palette per the Kyoso reference: near-black canvas, a slightly lifted panel,
+   low-contrast hairlines, and text that stops short of pure white. */
+:root.dark {
+    color-scheme: dark;
+
+    --canvas: #171717;
+    --panel: #1f1f1f;
+    --border: #2f2f2f;
+    --border-subtle: #262626;
+    --text: #ededed;
+    --text-muted: #8f8f8f;
+    --fill-hover: #262626;
+    --action: #4a86ff;
+    --state-bg: #1d2c47;
+    --state-fg: #a8c7ff;
+    --over-bg: #3a2e15;
+    --over-fg: #e3b463;
+    --over-bar: #d9a441;
+
+    --primary-foreground: #0f1420;
+    --destructive: oklch(0.62 0.21 25);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -90,4 +118,49 @@
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+/* Logo loader: a stroke running the length of the mark, in and then out. */
+.lg-track {
+  fill: #d5dae4;
+}
+
+/* On dark the light track would glare; drop it to roughly the tile grey. */
+:root.dark .lg-track {
+  fill: #2e2e2e;
+}
+
+.lg-stream {
+  fill: none;
+  stroke: #2757ff;
+  stroke-width: 4.4;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-dasharray: 100 100;
+  animation: lg-flow 2.6s infinite;
+}
+
+@keyframes lg-flow {
+  0% {
+    stroke-dashoffset: 100;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1);
+  }
+  44% {
+    stroke-dashoffset: 0;
+    animation-timing-function: linear;
+  }
+  56% {
+    stroke-dashoffset: 0;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.45, 1);
+  }
+  100% {
+    stroke-dashoffset: -100;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-stream {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
 }

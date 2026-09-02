@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { formatMoney } from '@/lib/format'
 import { DirectionPhoto } from '@/components/Photo/DirectionPhoto'
+import { photoAspect } from '@/lib/tileHeights'
 import type { BadgeKind, DirectionCard } from '@/types'
 
 const BADGE_CLASS: Record<BadgeKind, string> = {
@@ -16,25 +17,38 @@ interface DirectionCardTileProps {
   card: DirectionCard
   highlighted: boolean
   chosen: boolean
+  /** Staggers the entrance so columns arrive one after another. */
+  delayMs: number
   onOpen: () => void
 }
 
-export function DirectionCardTile({ card, highlighted, chosen, onOpen }: DirectionCardTileProps) {
+export function DirectionCardTile({ card, highlighted, chosen, delayMs, onOpen }: DirectionCardTileProps) {
   const { direction, archetype, price, badges, selectable } = card
 
   return (
     <button
       type="button"
       onClick={onOpen}
+      // fill-mode-both holds the tile invisible until its column's turn comes,
+      // instead of showing it and then animating.
+      style={{ animationDelay: `${delayMs}ms` }}
       className={cn(
-        'flex w-full flex-col gap-2.5 rounded-xl border bg-card p-3 text-left transition-colors',
-        'hover:border-foreground/20',
-        highlighted && 'border-state-fg',
-        chosen && 'border-state-fg bg-state-bg',
+        'group/tile flex w-full flex-col gap-2 text-left',
+        'animate-in fade-in slide-in-from-bottom-6 fill-mode-both duration-500 ease-out',
         !selectable && 'opacity-70',
       )}
     >
-      <DirectionPhoto archetype={archetype} />
+      {/* With the frame gone, selection reads as a ring around the photo
+          rather than around the whole tile. */}
+      <DirectionPhoto
+        archetype={archetype}
+        aspect={photoAspect(direction.id)}
+        className={cn(
+          'ring-offset-2 ring-offset-background transition-shadow',
+          highlighted && 'ring-2 ring-state-fg/50',
+          chosen && 'ring-2 ring-state-fg',
+        )}
+      />
 
       <div className="flex flex-col gap-1">
         <span className="text-sm font-medium leading-snug">{direction.label}</span>

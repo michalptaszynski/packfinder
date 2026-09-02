@@ -28,7 +28,10 @@ export function useScrollCarousel() {
   function scrollBy(direction: 1 | -1) {
     const el = ref.current
     if (!el) return
-    el.scrollBy({ left: direction * el.clientWidth * 0.8, behavior: 'smooth' })
+    // Capped: a page-sized jump on a barely-overflowing strip lands on an end
+    // stop every time, which reads as the arrow doing nothing.
+    const step = Math.min(el.clientWidth * 0.8, 360)
+    el.scrollBy({ left: direction * step, behavior: 'smooth' })
   }
 
   return { ref, canScrollLeft, canScrollRight, scrollBy }

@@ -36,6 +36,7 @@ export type Action =
   | { type: 'TOGGLE_ADDON'; addonId: string }
   | { type: 'GO_TO_HANDOFF' }
   | { type: 'BACK_TO_CONVERSATION' }
+  | { type: 'RESET_SESSION' }
 
 function defaultHighlight(cards: DirectionCard[]): string | null {
   const firstSelectable = cards.find((c) => c.selectable)
@@ -60,6 +61,11 @@ const initialState: SessionState = {
 
 function reducer(state: SessionState, action: Action): SessionState {
   switch (action.type) {
+    // Back to a blank brief. The message list is rebuilt from initialState, so
+    // the first question is asked again rather than duplicated.
+    case 'RESET_SESSION':
+      return { ...initialState, messages: [...initialState.messages] }
+
     case 'MERGE_SLOTS':
       return { ...state, slots: { ...state.slots, ...action.slots } }
 

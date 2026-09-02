@@ -16,10 +16,9 @@ const FEATURED_ORDER = ['clothing', 'cosmetics', 'gift_set', 'bottles', 'food']
 export function ChatHero() {
   const dispatch = useSessionDispatch()
   const { ref: mainRef, canScrollLeft: mainCanScrollLeft, canScrollRight: mainCanScrollRight, scrollBy: mainScrollBy } = useScrollCarousel()
-  const { ref: restRef, canScrollLeft: restCanScrollLeft, canScrollRight: restCanScrollRight, scrollBy: restScrollBy } = useScrollCarousel()
 
   function pick(preset: CategoryPreset) {
-    dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'user', text: preset.label } })
+    dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'user', text: preset.label, image: preset.photo } })
     dispatch({
       type: 'REBUILD_GRID',
       slots: {
@@ -73,21 +72,14 @@ export function ChatHero() {
       </div>
 
       <div className="flex flex-col gap-3">
-        <CarouselHeader
-          title="More categories"
-          canScrollLeft={restCanScrollLeft}
-          canScrollRight={restCanScrollRight}
-          onScrollLeft={() => restScrollBy(-1)}
-          onScrollRight={() => restScrollBy(1)}
-        />
-        <div
-          ref={restRef}
-          className="grid grid-flow-col grid-rows-3 gap-x-6 gap-y-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
+        <h3 className="text-sm font-semibold">More categories</h3>
+        {/* Two fixed columns rather than a scroller: the eight remaining
+            categories fit on one screen, so there is nothing to page through. */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-3">
           {rest.map((preset) => (
-            <button key={preset.id} type="button" onClick={() => pick(preset)} className="group flex w-44 items-center gap-3 text-left">
+            <button key={preset.id} type="button" onClick={() => pick(preset)} className="group flex w-full min-w-0 items-center gap-3 text-left">
               {preset.photo ? (
-                <span className="size-10 flex-none overflow-hidden rounded-lg">
+                <span className="size-16 flex-none overflow-hidden rounded-xl">
                   <img
                     src={preset.photo}
                     alt=""
@@ -95,9 +87,9 @@ export function ChatHero() {
                   />
                 </span>
               ) : (
-                <span className="size-10 flex-none rounded-lg bg-muted" />
+                <span className="size-16 flex-none rounded-xl bg-muted" />
               )}
-              <span className="text-sm text-muted-foreground">{preset.label}</span>
+              <span className="truncate text-sm text-muted-foreground">{preset.label}</span>
             </button>
           ))}
         </div>

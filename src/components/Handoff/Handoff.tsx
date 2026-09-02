@@ -142,5 +142,5 @@ export function Handoff() {
 }
 
 function cnBar(over: boolean) {
-  return `h-full rounded-full ${over ? 'bg-over-bar' : 'bg-foreground'}`
+  return `h-full rounded-full ${over ? 'bg-over-bar' : 'bg-primary'}`
 }

@@ -1,4 +1,5 @@
 import { CATEGORY_PRESETS, CHANNEL_OPTIONS } from '../data/categoryPresets'
+import { cmToMm } from '../lib/units'
 import type { Channel, Slots } from '../types'
 
 export interface Interpretation {
@@ -51,6 +52,7 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
   vitamin: 'health',
   health: 'health',
   accessor: 'accessories',
+  'something else': 'other',
 }
 
 const CHANNEL_KEYWORDS: Record<string, Channel> = {
@@ -59,7 +61,8 @@ const CHANNEL_KEYWORDS: Record<string, Channel> = {
   mail: 'courier',
   deliver: 'courier',
   shelf: 'retail_shelf',
-  'product box': 'retail_shelf',
+  'product pack': 'retail_shelf',
+  'unbox': 'retail_shelf',
   retail: 'retail_shelf',
   store: 'retail_shelf',
 }
@@ -99,9 +102,11 @@ export function interpretMessage(text: string, currentSlots: Slots): Interpretat
     }
   }
 
-  const dimsMatch = lower.match(/(\d{1,4})\s*[x×]\s*(\d{1,4})\s*[x×]\s*(\d{1,4})/)
+  const number = String.raw`\d{1,4}(?:[.,]\d{1,2})?`
+  const dimsMatch = lower.match(new RegExp(`(${number})\\s*[x×]\\s*(${number})\\s*[x×]\\s*(${number})`))
   if (dimsMatch) {
-    const [w, h, d] = [Number(dimsMatch[1]), Number(dimsMatch[2]), Number(dimsMatch[3])]
+    // Typed sizes are centimetres; slots are millimetres.
+    const [w, h, d] = dimsMatch.slice(1, 4).map((raw) => cmToMm(Number(raw.replace(',', '.'))))
     if ([w, h, d].every((v) => Number.isFinite(v) && v > 0)) {
       slotUpdates.dimensions = { value: { w, h, d }, source: 'chat' }
       matched = true
