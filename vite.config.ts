@@ -51,6 +51,9 @@ function claudeApi(mode: string): Plugin {
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
+  // Served from a repo subpath on GitHub Pages; without this the built asset
+  // URLs point at the domain root and the page loads blank.
+  base: '/packfinder/',
   plugins: [react(), tailwindcss(), claudeApi(mode)],
   resolve: {
     alias: {
