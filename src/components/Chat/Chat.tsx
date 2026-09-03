@@ -336,72 +336,21 @@ export function Chat({
     }
   }
 
-  return (
-    <div className="relative h-full">
-      <div ref={scrollRef} className="absolute inset-0 overflow-y-auto">
-        <div
-          className={cn('mx-auto flex w-full flex-col gap-4 p-6', centered && !freshV1 && 'max-w-[832px]')}
-          style={
-            freshV1
-              ? { paddingTop: HERO_TOP_PX + bottomHeight + 24 }
-              : { paddingTop: topInset + 24, paddingBottom: bottomHeight + 40 }
-          }
-        >
-          {altFresh ? null : isFresh ? (
-            <ChatHero />
-          ) : introLoading ? null : (
-            <div className="flex flex-col gap-3">
-              {state.messages.map((message, index) => (
-                <ChatBubble
-                  key={message.id}
-                  message={message}
-                  joinAbove={state.messages[index - 1]?.role === message.role}
-                  joinBelow={state.messages[index + 1]?.role === message.role}
-                  // During the intro the transcript comes in behind the
-                  // composer, one bubble after the next.
-                  delayMs={intro === 'enter' ? 120 + index * INTRO_STAGGER_MS : 0}
-                />
-              ))}
-              {altQuiz && questionPending && (
-                <QuizControls
-                  clarification={clarification}
-                  onClarified={() => setClarification(null)}
-                  onSend={(text) => void handleSend(text)}
-                  altQuiz
-                />
-              )}
-              {thinking && (
-                <div className="flex max-w-[92%] items-center gap-2 self-start py-2">
-                  {[0, 1, 2].map((dot) => (
-                    <span
-                      key={dot}
-                      className="size-2 animate-bounce rounded-full bg-muted-foreground/60"
-                      style={{ animationDelay: `${dot * 140}ms` }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {introLoading && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <LogoLoader size={46} />
-        </div>
-      )}
-
-      {!introLoading && (
+  /**
+   * Headline, composer, suggestion chips — one element, wherever it lands.
+   *
+   * On the default hero it scrolls with the board, like everything else on
+   * that page; in a conversation it is pinned to the bottom of the panel. It
+   * has to stay a single node across that switch or the textarea remounts.
+   */
+  const composerStack = introLoading ? null : (
       <div
         ref={bottomRef}
-        style={freshV1 ? { top: HERO_TOP_PX } : undefined}
         className={cn(
-          'pointer-events-none absolute inset-x-6 mx-auto flex flex-col gap-3',
+          'pointer-events-none z-20 mx-auto flex w-full flex-col gap-3',
           // Sits below centre — the strip underneath needs the room more than
           // the empty space above the headline does.
-          // freshV1's offset is an inline style: an interpolated class name
-          // would never make it into the generated CSS.
+          freshV1 ? 'relative' : 'absolute inset-x-6',
           altFresh ? 'top-1/2 translate-y-[calc(-50%+120px)]' : !freshV1 && 'bottom-6',
           centered && 'max-w-[832px]',
           intro === 'enter' && 'animate-in slide-in-from-bottom-24 fade-in duration-500 ease-out',
@@ -554,7 +503,66 @@ export function Chat({
 
         {altFresh && <AltHeroStrip />}
       </div>
+  )
+
+  return (
+    <div className="relative h-full">
+      <div ref={scrollRef} className="absolute inset-0 overflow-y-auto">
+        <div
+          className={cn('mx-auto flex w-full flex-col gap-4 p-6', centered && !freshV1 && 'max-w-[832px]')}
+          style={
+            freshV1 ? { paddingTop: HERO_TOP_PX } : { paddingTop: topInset + 24, paddingBottom: bottomHeight + 40 }
+          }
+        >
+          {freshV1 && composerStack}
+
+          {altFresh ? null : isFresh ? (
+            <ChatHero />
+          ) : introLoading ? null : (
+            <div className="flex flex-col gap-3">
+              {state.messages.map((message, index) => (
+                <ChatBubble
+                  key={message.id}
+                  message={message}
+                  joinAbove={state.messages[index - 1]?.role === message.role}
+                  joinBelow={state.messages[index + 1]?.role === message.role}
+                  // During the intro the transcript comes in behind the
+                  // composer, one bubble after the next.
+                  delayMs={intro === 'enter' ? 120 + index * INTRO_STAGGER_MS : 0}
+                />
+              ))}
+              {altQuiz && questionPending && (
+                <QuizControls
+                  clarification={clarification}
+                  onClarified={() => setClarification(null)}
+                  onSend={(text) => void handleSend(text)}
+                  altQuiz
+                />
+              )}
+              {thinking && (
+                <div className="flex max-w-[92%] items-center gap-2 self-start py-2">
+                  {[0, 1, 2].map((dot) => (
+                    <span
+                      key={dot}
+                      className="size-2 animate-bounce rounded-full bg-muted-foreground/60"
+                      style={{ animationDelay: `${dot * 140}ms` }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {introLoading && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <LogoLoader size={46} />
+        </div>
       )}
+
+      {!freshV1 && composerStack}
+
     </div>
   )
 }
