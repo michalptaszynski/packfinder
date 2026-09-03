@@ -1,3 +1,4 @@
+import { asset } from '../lib/asset'
 import type { CoverageChoice, MaterialChoice, Slots, StripChoice } from '../types'
 
 /**
@@ -18,9 +19,9 @@ export interface RefinementOption<T extends string> {
 }
 
 export const MATERIAL_OPTIONS: RefinementOption<MaterialChoice>[] = [
-  { value: 'kraft', title: 'Kraft', description: 'Natural brown board — the plainest, cheapest surface.', photo: '/photos/materials/material-kraft.png' },
-  { value: 'white', title: 'White', description: 'Bleached board — colours print truer on it.', photo: '/photos/materials/material-white.png' },
-  { value: 'coated', title: 'Coated', description: 'Smooth coated stock for saturated, photographic print.', photo: '/photos/materials/material-white-premium.png' },
+  { value: 'kraft', title: 'Kraft', description: 'Natural brown board — the plainest, cheapest surface.', photo: asset('/photos/materials/material-kraft.png') },
+  { value: 'white', title: 'White', description: 'Bleached board — colours print truer on it.', photo: asset('/photos/materials/material-white.png') },
+  { value: 'coated', title: 'Coated', description: 'Smooth coated stock for saturated, photographic print.', photo: asset('/photos/materials/material-white-premium.png') },
   { value: 'any', title: 'No preference', description: "Show every material — I'll judge by the look." },
 ]
 

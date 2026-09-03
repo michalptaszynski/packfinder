@@ -1,3 +1,4 @@
+import { asset } from '../lib/asset'
 import type { Dimensions, Fragility } from '../types'
 
 export interface CategoryPreset {
@@ -27,7 +28,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 250, h: 350, d: 50 },
     weight: 300,
     fragility: 'low',
-    photo: '/photos/main/clothing.jpg',
+    photo: asset('/photos/main/clothing.jpg'),
   },
   {
     id: 'cosmetics',
@@ -37,7 +38,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 60, h: 120, d: 60 },
     weight: 150,
     fragility: 'low',
-    photo: '/photos/main/cosmetics.jpg',
+    photo: asset('/photos/main/cosmetics.jpg'),
   },
   {
     id: 'gift_set',
@@ -47,7 +48,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 230, h: 160, d: 70 },
     weight: 600,
     fragility: 'medium',
-    photo: '/photos/main/gift_set.jpg',
+    photo: asset('/photos/main/gift_set.jpg'),
   },
   {
     id: 'bottles',
@@ -57,7 +58,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 70, h: 220, d: 70 },
     weight: 500,
     fragility: 'high',
-    photo: '/photos/main/bottles.jpg',
+    photo: asset('/photos/main/bottles.jpg'),
   },
   {
     id: 'food',
@@ -68,7 +69,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     weight: 400,
     fragility: 'medium',
     foodContact: true,
-    photo: '/photos/main/food.jpg',
+    photo: asset('/photos/main/food.jpg'),
   },
   {
     id: 'jewelry',
@@ -78,7 +79,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 80, h: 60, d: 25 },
     weight: 50,
     fragility: 'medium',
-    photo: '/photos/main/jewelry.jpg',
+    photo: asset('/photos/main/jewelry.jpg'),
   },
   {
     id: 'electronics',
@@ -88,7 +89,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 180, h: 120, d: 60 },
     weight: 350,
     fragility: 'high',
-    photo: '/photos/main/electronics.jpg',
+    photo: asset('/photos/main/electronics.jpg'),
   },
   {
     id: 'stationery',
@@ -98,7 +99,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 210, h: 297, d: 10 },
     weight: 100,
     fragility: 'low',
-    photo: '/photos/main/stationery.jpg',
+    photo: asset('/photos/main/stationery.jpg'),
   },
   {
     id: 'toys',
@@ -108,7 +109,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 200, h: 150, d: 100 },
     weight: 400,
     fragility: 'medium',
-    photo: '/photos/main/toys.jpg',
+    photo: asset('/photos/main/toys.jpg'),
   },
   {
     id: 'footwear',
@@ -118,7 +119,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 330, h: 200, d: 120 },
     weight: 800,
     fragility: 'low',
-    photo: '/photos/main/footwear.jpg',
+    photo: asset('/photos/main/footwear.jpg'),
   },
   {
     id: 'health',
@@ -128,7 +129,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 80, h: 150, d: 80 },
     weight: 200,
     fragility: 'medium',
-    photo: '/photos/main/health.jpg',
+    photo: asset('/photos/main/health.jpg'),
   },
   {
     id: 'accessories',
@@ -138,7 +139,7 @@ export const CATEGORY_PRESETS: CategoryPreset[] = [
     dimensions: { w: 200, h: 150, d: 80 },
     weight: 250,
     fragility: 'low',
-    photo: '/photos/main/accessories.jpg',
+    photo: asset('/photos/main/accessories.jpg'),
   },
   {
     id: 'other',

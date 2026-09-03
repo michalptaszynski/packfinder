@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { asset } from '@/lib/asset'
 import { LogoLoader } from './LogoLoader'
 
 /**
@@ -51,7 +52,7 @@ const PHOTOS = [
   'packhelp-09-2021-0306',
   'packhelp-28445-2',
   'packhelp-26-28-05-2021-7152',
-].map((name) => `/photos/inspiration/${name}.jpg`)
+].map((name) => asset(`/photos/inspiration/${name}.jpg`))
 
 const columnHeight = (visible: number) => visible * TILE_H + (visible - 1) * GAP
 const CLUSTER_H = Math.max(...COLUMNS.map((column) => column.top + columnHeight(column.visible)))
