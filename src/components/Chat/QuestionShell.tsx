@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useT } from '@/i18n/LanguageProvider'
 import { cn } from '@/lib/utils'
 
 interface QuestionShellProps {
@@ -14,6 +15,7 @@ interface QuestionShellProps {
 }
 
 export function QuestionShell({ title, children, onBack, canGoBack, onSkipAll, onNext, nextDisabled }: QuestionShellProps) {
+  const { t } = useT()
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xl">
       <div className="border-b border-border bg-muted/50 px-4 py-3">
@@ -28,21 +30,21 @@ export function QuestionShell({ title, children, onBack, canGoBack, onSkipAll, o
             type="button"
             disabled={!canGoBack}
             onClick={onBack}
-            className="flex size-7 items-center justify-center rounded-md text-muted-foreground disabled:opacity-30 enabled:hover:bg-muted"
+            className="flex size-8 items-center justify-center rounded-md text-muted-foreground disabled:opacity-30 enabled:hover:bg-muted"
           >
             <ChevronLeft size={15} />
           </button>
-          <button type="button" disabled className="flex size-7 items-center justify-center rounded-md text-muted-foreground opacity-30">
+          <button type="button" disabled className="flex size-8 items-center justify-center rounded-md text-muted-foreground opacity-30">
             <ChevronRight size={15} />
           </button>
         </div>
 
         <div className="flex items-center gap-3">
           <button type="button" onClick={onSkipAll} className="text-xs text-muted-foreground hover:text-foreground">
-            Skip all
+            {t('chrome.skipAll', 'Skip all')}
           </button>
           <Button size="sm" onClick={onNext} disabled={nextDisabled}>
-            Next
+            {t('chrome.next', 'Next')}
           </Button>
         </div>
       </div>
@@ -88,7 +90,7 @@ export function OptionRow({ selected, title, description, thumb, showThumb, onCl
   )
 }
 
-export function RadioDot({ selected }: { selected: boolean }) {
+export function RadioDot({ selected, className }: { selected: boolean; className?: string }) {
   return (
     <span
       className={cn(
@@ -96,6 +98,7 @@ export function RadioDot({ selected }: { selected: boolean }) {
         // card behind it is filled rather than white.
         'mt-0.5 flex size-4 flex-none items-center justify-center rounded-full border bg-card',
         selected ? 'border-primary' : 'border-input',
+        className,
       )}
     >
       {selected && <span className="size-2 rounded-full bg-primary" />}

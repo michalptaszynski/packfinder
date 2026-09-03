@@ -93,7 +93,7 @@ export function Handoff() {
         {!direction || !archetype || !card || !price?.valid ? (
           <p className="p-4 text-sm text-muted-foreground">No direction has been chosen yet.</p>
         ) : (
-          <div className="flex flex-col gap-5 px-1 pb-2">
+          <div className="flex flex-col gap-6 px-1 pb-2">
             {budgetTotal !== undefined && (
               <div className="flex items-center gap-3">
                 <div className="relative h-2 flex-1 rounded-full bg-border-subtle">

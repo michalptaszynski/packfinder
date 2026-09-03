@@ -27,9 +27,41 @@ export function AltHeroHeadline() {
 }
 
 /** Featured first, then the rest — the strip holds the whole catalogue. */
+/**
+ * Openers offered under the composer. Picking one drops it into the field with
+ * the caret at the end rather than sending it — each is a half-sentence the
+ * user finishes, which is also what makes them parseable.
+ */
+const OPENERS = [
+  'I need an aesthetic package for shipping',
+  'I want a beautiful package for',
+  'I need an economic mailer box for',
+]
+
+export function AltHeroPrompts({ onPick }: { onPick: (text: string) => void }) {
+  return (
+    <div className="pointer-events-auto flex flex-wrap justify-center gap-2">
+      {OPENERS.map((opener) => (
+        <button
+          key={opener}
+          type="button"
+          onClick={() => onPick(`${opener} `)}
+          className="rounded-full border border-border bg-card px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-fill-hover hover:text-foreground"
+        >
+          {opener}…
+        </button>
+      ))}
+    </div>
+  )
+}
+
 const STRIP_ORDER = ['clothing', 'cosmetics', 'bottles', 'food', 'gift_set', 'jewelry', 'electronics', 'footwear', 'toys', 'stationery', 'health', 'accessories']
 
-export function AltHeroStrip() {
+export function AltHeroStrip({ showOther = true, wide = false }: { showOther?: boolean; wide?: boolean }) {
+  // The default hero has the full panel to play with, so its tiles run at
+  // twice the width of the ones packed under the alternate hero's composer.
+  const tile = wide ? 'w-48' : 'w-24'
+  const thumb = wide ? 'h-40' : 'h-32'
   const dispatch = useSessionDispatch()
   const { ref, canScrollLeft, canScrollRight, scrollBy } = useScrollCarousel()
 
@@ -51,7 +83,10 @@ export function AltHeroStrip() {
     })
   }
 
-  const other = CATEGORY_PRESETS.find((preset) => preset.id === 'other')
+  // The default hero already opens on a board of starting points, so it takes
+  // the strip without the "Not sure yet" tile — there is nothing to fall back
+  // from at the top of the page.
+  const other = showOther ? CATEGORY_PRESETS.find((preset) => preset.id === 'other') : undefined
 
   return (
     <div className="pointer-events-auto flex flex-col gap-2">
@@ -69,14 +104,14 @@ export function AltHeroStrip() {
         <span
           aria-hidden
           className={cn(
-            'pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-card to-transparent transition-opacity duration-200',
+            'pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background to-transparent transition-opacity duration-200',
             canScrollLeft ? 'opacity-100' : 'opacity-0',
           )}
         />
         <span
           aria-hidden
           className={cn(
-            'pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-card to-transparent transition-opacity duration-200',
+            'pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background to-transparent transition-opacity duration-200',
             canScrollRight ? 'opacity-100' : 'opacity-0',
           )}
         />
@@ -84,8 +119,8 @@ export function AltHeroStrip() {
         <div ref={ref} className="flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {other && (
             <>
-              <button type="button" onClick={() => pick(other)} className="group flex w-24 flex-none flex-col gap-2 text-left">
-                <span className="flex h-32 w-full items-center justify-center rounded-xl bg-fill-hover text-muted-foreground transition-colors group-hover:bg-muted">
+              <button type="button" onClick={() => pick(other)} className={cn('group flex flex-none flex-col gap-2 text-left', tile)}>
+                <span className={cn('flex w-full items-center justify-center rounded-xl bg-fill-hover text-muted-foreground transition-colors group-hover:bg-muted', thumb)}>
                   <Sparkles size={20} strokeWidth={1.5} />
                 </span>
                 <span className="truncate text-center text-xs text-muted-foreground">Not sure yet</span>
@@ -95,9 +130,9 @@ export function AltHeroStrip() {
           )}
 
           {presets.map((preset) => (
-            <button key={preset.id} type="button" onClick={() => pick(preset)} className="group flex w-24 flex-none flex-col gap-2 text-left">
+            <button key={preset.id} type="button" onClick={() => pick(preset)} className={cn('group flex flex-none flex-col gap-2 text-left', tile)}>
               {preset.photo ? (
-                <span className="h-32 w-full overflow-hidden rounded-xl">
+                <span className={cn('w-full overflow-hidden rounded-xl', thumb)}>
                   <img
                     src={preset.photo}
                     alt=""
@@ -105,7 +140,7 @@ export function AltHeroStrip() {
                   />
                 </span>
               ) : (
-                <span className="h-32 w-full rounded-xl bg-muted transition-colors group-hover:bg-fill-hover" />
+                <span className={cn('w-full rounded-xl bg-muted transition-colors group-hover:bg-fill-hover', thumb)} />
               )}
               <span className="truncate text-center text-xs text-muted-foreground">{preset.label}</span>
             </button>

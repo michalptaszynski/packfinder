@@ -77,12 +77,12 @@ function StatTile({ icon, label, value, editValue, suffix, onCommit }: StatTileP
   }
 
   return (
-    <div className="flex min-w-[220px] flex-1 items-center gap-3 rounded-2xl bg-fill-hover px-4 py-3">
-      <span className="flex size-9 flex-none items-center justify-center rounded-lg text-foreground">{icon}</span>
+    <div className="flex min-w-[224px] flex-1 items-center gap-3 rounded-2xl bg-fill-hover px-4 py-3">
+      <span className="flex size-8 flex-none items-center justify-center rounded-lg text-foreground">{icon}</span>
 
       <span className="flex min-w-0 flex-1 flex-col">
         {editing ? (
-          <span className="flex items-center gap-1.5">
+          <span className="flex items-center gap-2">
             <input
               ref={inputRef}
               type="text"
@@ -115,7 +115,7 @@ function StatTile({ icon, label, value, editValue, suffix, onCommit }: StatTileP
           setEditing(true)
         }}
         className={cn(
-          'flex size-7 flex-none items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-card hover:text-foreground',
+          'flex size-8 flex-none items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-card hover:text-foreground',
           editing && 'invisible',
         )}
       >

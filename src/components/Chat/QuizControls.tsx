@@ -11,8 +11,10 @@ import {
   nextRefinement,
   type RefinementOption,
 } from '@/data/refinements'
+import { BUDGET_BANDS, QUANTITY_BANDS } from '@/data/bands'
 import { formatMoney } from '@/lib/format'
 import { cmToMm, formatCm } from '@/lib/units'
+import { useT } from '@/i18n/LanguageProvider'
 import { cn } from '@/lib/utils'
 import { OptionRow, QuestionShell, RadioDot } from './QuestionShell'
 import { OptionCards, type ChoiceOption } from './OptionCards'
@@ -21,19 +23,6 @@ import type { BoxEdge } from './BoxOutline'
 import type { CoverageChoice, Dimensions, MaterialChoice, Slots, StripChoice } from '@/types'
 import type { Clarification } from '@/llm/clarify'
 
-const QUANTITY_BANDS = [
-  { id: 'q1', title: '30–100 pcs', description: 'A first small batch, testing the market.', value: 65 },
-  { id: 'q2', title: '100–300 pcs', description: 'A standard first production run.', value: 180 },
-  { id: 'q3', title: '300–1000 pcs', description: 'A bigger batch, better unit price.', value: 600 },
-  { id: 'q4', title: '1000+ pcs', description: 'High volume, the lowest price per piece.', value: 1500 },
-]
-
-const BUDGET_BANDS = [
-  { id: 'b1', title: 'Up to £0.50 / pc', description: 'A very lean option, functional packaging.', value: 0.4 },
-  { id: 'b2', title: '£0.50 – £1.00 / pc', description: 'A reasonable e-commerce standard.', value: 0.75 },
-  { id: 'b3', title: '£1.00 – £3.00 / pc', description: 'A step up, more finishing options.', value: 2 },
-  { id: 'b4', title: 'Above £3.00 / pc', description: 'Premium — rigid boxes, foiling.', value: 4 },
-]
 
 const CUSTOM = 'custom'
 
@@ -74,13 +63,16 @@ interface QuizControlsProps {
   clarification?: Clarification | null
   /** Sends an answer back through the chat's normal parse path. */
   onSend: (text: string) => void
+  /** Called once a clarification has been answered, so its card goes away. */
+  onClarified?: () => void
   /** Answers as side-by-side cards instead of one bordered list. */
   altQuiz: boolean
 }
 
-export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsProps) {
+export function QuizControls({ clarification, onSend, onClarified, altQuiz }: QuizControlsProps) {
   const state = useSessionState()
   const dispatch = useSessionDispatch()
+  const { t } = useT()
   const status = quizStatus(state.slots)
 
   function commit(summaryText: string, slots: Partial<Slots>, extra?: MessageExtra) {
@@ -102,7 +94,7 @@ export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsPro
 
   /** Leaves every remaining refinement open rather than guessing a preference. */
   function skipRefinements() {
-    dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'user', text: 'No preference on the rest' } })
+    dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'user', text: t('chrome.noPreferenceRest', 'No preference on the rest') } })
     dispatch({
       type: 'REBUILD_GRID',
       slots: {
@@ -114,7 +106,7 @@ export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsPro
   }
 
   function skipAll() {
-    dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'user', text: 'Skip the rest of the questions' } })
+    dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'user', text: t('chrome.skipRest', 'Skip the rest of the questions') } })
     dispatch({ type: 'REBUILD_GRID', slots: buildSkipDefaults(state.slots) })
   }
 
@@ -134,9 +126,13 @@ export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsPro
         onPick={(value) => {
           const option = clarification.options.find((o) => o.label === value)
           if (!option) return
+          // Answered — the card has to go, or the same choice is served again
+          // on the next render and the quiz never gets back to its own step.
+          onClarified?.()
           // Model-authored options already carry the resolved reading; rule-based
-          // ones carry a sentence the offline parser knows how to read.
-          if (option.slots) commit(option.label, option.slots)
+          // ones carry a sentence the offline parser knows how to read. An empty
+          // slot set resolves nothing, so it goes back through the parser.
+          if (option.slots && Object.keys(option.slots).length > 0) commit(option.label, option.slots)
           else onSend(option.message)
         }}
       />
@@ -146,7 +142,9 @@ export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsPro
   if (status.nextStep === null) {
     const refineStep = nextRefinement(state.slots)
     if (refineStep === null) return null
-    const { question, slot, options } = REFINE_STEPS[refineStep]
+    const { slot, options } = REFINE_STEPS[refineStep]
+    const question = t(`refine.${refineStep}`, REFINE_STEPS[refineStep].question)
+    const group = (['material', 'coverage', 'strip'] as const)[refineStep]
     return (
       <ChoiceStep
         key={`refine-${refineStep}`}
@@ -157,8 +155,8 @@ export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsPro
         showThumbs
         options={(options as readonly RefinementOption<string>[]).map((option) => ({
           value: option.value,
-          title: option.title,
-          description: option.description,
+          title: t(`${group}.${option.value}.title`, option.title),
+          description: t(`${group}.${option.value}.description`, option.description),
           photo: option.photo,
           photoShort: true,
         }))}
@@ -166,7 +164,7 @@ export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsPro
           const option = (options as readonly RefinementOption<string>[]).find((o) => o.value === value)
           if (!option) return
           commit(
-            option.title,
+            t(`${group}.${option.value}.title`, option.title),
             { [slot]: { value: option.value as MaterialChoice & CoverageChoice & StripChoice, source: 'quiz' } } as Partial<Slots>,
             { image: option.photo },
           )
@@ -181,18 +179,18 @@ export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsPro
         <ChoiceStep
           key={0}
           {...shared}
-          title={QUIZ_QUESTIONS[0]}
+          title={t('quiz.0', QUIZ_QUESTIONS[0])}
           options={CATEGORY_PRESETS.map((preset) => ({
             value: preset.id,
-            title: preset.label,
-            description: preset.blurb,
+            title: t(`cat.${preset.id}.label`, preset.label),
+            description: t(`cat.${preset.id}.blurb`, preset.blurb),
             photo: preset.photo,
           }))}
           onPick={(value) => {
             const preset = CATEGORY_PRESETS.find((p) => p.id === value)
             if (!preset) return
             commit(
-              preset.label,
+              t(`cat.${preset.id}.label`, preset.label),
               {
                 productCategory: { value: preset.id, source: 'quiz' },
                 dimensions: { value: preset.dimensions, source: 'inferred' },
@@ -211,12 +209,16 @@ export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsPro
         <ChoiceStep
           key={1}
           {...shared}
-          title={QUIZ_QUESTIONS[1]}
-          options={CHANNEL_OPTIONS.map((option) => ({ value: option.id, title: option.label, description: option.blurb }))}
+          title={t('quiz.1', QUIZ_QUESTIONS[1])}
+          options={CHANNEL_OPTIONS.map((option) => ({
+            value: option.id,
+            title: t(`channel.${option.id}.label`, option.label),
+            description: t(`channel.${option.id}.blurb`, option.blurb),
+          }))}
           onPick={(value) => {
             const option = CHANNEL_OPTIONS.find((o) => o.id === value)
             if (!option) return
-            commit(option.label, { channel: { value: option.id, source: 'quiz' } })
+            commit(t(`channel.${option.id}.label`, option.label), { channel: { value: option.id, source: 'quiz' } })
           }}
         />
       )
@@ -229,21 +231,29 @@ export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsPro
         <ChoiceStep
           key={3}
           {...shared}
-          title={QUIZ_QUESTIONS[3]}
+          title={t('quiz.3', QUIZ_QUESTIONS[3])}
           options={[
-            ...QUANTITY_BANDS.map((band) => ({ value: band.id, title: band.title, description: band.description })),
-            { value: CUSTOM, title: 'An exact number', input: { placeholder: 'e.g. 250', suffix: 'pcs' } },
+            ...QUANTITY_BANDS.map((band) => ({
+              value: band.id,
+              title: t(`band.${band.id}.title`, band.title),
+              description: t(`band.${band.id}.description`, band.description),
+            })),
+            {
+              value: CUSTOM,
+              title: t('chrome.exactNumber', 'An exact number'),
+              input: { placeholder: t('chrome.exactNumberHint', 'e.g. 250'), suffix: t('chrome.pcs', 'pcs') },
+            },
           ]}
           onPick={(value, draft) => {
             if (value === CUSTOM) {
               const exact = Math.round(Number(draft.replace(',', '.')))
               if (!Number.isFinite(exact) || exact <= 0) return
-              commit(`${exact} pcs`, { quantity: { value: exact, source: 'quiz' } })
+              commit(`${exact} ${t('chrome.pcs', 'pcs')}`, { quantity: { value: exact, source: 'quiz' } })
               return
             }
             const band = QUANTITY_BANDS.find((b) => b.id === value)
             if (!band) return
-            commit(band.title, { quantity: { value: band.value, source: 'quiz' } })
+            commit(t(`band.${band.id}.title`, band.title), { quantity: { value: band.value, source: 'quiz' } })
           }}
         />
       )
@@ -254,10 +264,18 @@ export function QuizControls({ clarification, onSend, altQuiz }: QuizControlsPro
         <ChoiceStep
           key={4}
           {...shared}
-          title={QUIZ_QUESTIONS[4]}
+          title={t('quiz.4', QUIZ_QUESTIONS[4])}
           options={[
-            ...BUDGET_BANDS.map((band) => ({ value: band.id, title: band.title, description: band.description })),
-            { value: CUSTOM, title: 'An exact amount', input: { placeholder: 'e.g. 1.20', prefix: '£', suffix: '/pc' } },
+            ...BUDGET_BANDS.map((band) => ({
+              value: band.id,
+              title: t(`band.${band.id}.title`, band.title),
+              description: t(`band.${band.id}.description`, band.description),
+            })),
+            {
+              value: CUSTOM,
+              title: t('chrome.exactAmount', 'An exact amount'),
+              input: { placeholder: t('chrome.exactAmountHint', 'e.g. 1.20'), prefix: '£', suffix: t('chrome.perPiece', '/pc') },
+            },
           ]}
           onPick={(value, draft) => {
             const perPiece =
@@ -346,7 +364,7 @@ function ChoiceStep({ title, options, alt, showThumbs, onPick, onBack, canGoBack
               onFocus={() => setSelected(option.value)}
               onChange={(e) => setDraft(e.target.value.replace(/[^\d.,]/g, ''))}
               placeholder={option.input.placeholder}
-              className="w-full rounded-md border border-input bg-transparent px-2 py-1.5 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring"
+              className="w-full rounded-md border border-input bg-transparent px-2 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring"
             />
             {option.input.suffix && <span className="flex-none text-xs text-muted-foreground">{option.input.suffix}</span>}
           </div>
@@ -378,6 +396,7 @@ interface DimensionsStepProps {
 }
 
 function DimensionsStep({ alt, slots, onCommit, onBack, canGoBack, onSkipAll }: DimensionsStepProps) {
+  const { t } = useT()
   // Kept as raw strings so a half-typed decimal ("12.") survives a re-render;
   // millimetres are derived on the way out.
   const [raw, setRaw] = useState(() => {
@@ -410,7 +429,7 @@ function DimensionsStep({ alt, slots, onCommit, onBack, canGoBack, onSkipAll }: 
       <BoxOutline dimensions={dims} highlight={focused} size={112} />
       <div className="flex min-w-0 flex-1 items-end gap-2">
         <DimField
-          label="Width"
+          label={t('chrome.width', 'Width')}
           active={focused === 'w'}
           value={raw.w}
           onChange={(w) => setRaw((c) => ({ ...c, w }))}
@@ -418,7 +437,7 @@ function DimensionsStep({ alt, slots, onCommit, onBack, canGoBack, onSkipAll }: 
           onSubmit={() => canProceed && handleNext()}
         />
         <DimField
-          label="Height"
+          label={t('chrome.height', 'Height')}
           active={focused === 'h'}
           value={raw.h}
           onChange={(h) => setRaw((c) => ({ ...c, h }))}
@@ -426,7 +445,7 @@ function DimensionsStep({ alt, slots, onCommit, onBack, canGoBack, onSkipAll }: 
           onSubmit={() => canProceed && handleNext()}
         />
         <DimField
-          label="Depth"
+          label={t('chrome.depth', 'Depth')}
           active={focused === 'd'}
           value={raw.d}
           onChange={(d) => setRaw((c) => ({ ...c, d }))}
@@ -462,7 +481,7 @@ function DimensionsStep({ alt, slots, onCommit, onBack, canGoBack, onSkipAll }: 
   }
 
   return (
-    <QuestionShell title={QUIZ_QUESTIONS[2]} onBack={onBack} canGoBack={canGoBack} onSkipAll={onSkipAll} onNext={handleNext} nextDisabled={!canProceed}>
+    <QuestionShell title={t('quiz.2', QUIZ_QUESTIONS[2])} onBack={onBack} canGoBack={canGoBack} onSkipAll={onSkipAll} onNext={handleNext} nextDisabled={!canProceed}>
       <div className="flex flex-col gap-3 px-4 py-4">
         <p className="text-xs text-muted-foreground">
           Give the product's exact dimensions (cm) — the engine adds clearance and shows the package's outer size.
@@ -511,7 +530,7 @@ function DimField({
           onFocus={() => onFocusChange(true)}
           onBlur={() => onFocusChange(false)}
           className={cn(
-            'w-full min-w-0 rounded-md border border-input bg-transparent py-1.5 pr-8 pl-2 text-sm text-foreground outline-none focus-visible:border-ring',
+            'w-full min-w-0 rounded-md border border-input bg-transparent py-2 pr-8 pl-2 text-sm text-foreground outline-none focus-visible:border-ring',
             active && 'border-primary',
           )}
         />

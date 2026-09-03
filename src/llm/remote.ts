@@ -22,18 +22,40 @@ interface ModelSlots {
 }
 
 type RemoteResponse =
-  | { kind: 'slots'; slots: ModelSlots }
-  | { kind: 'clarify'; message: string; question: string; options: { label: string; description: string; slots: ModelSlots }[] }
+  | { kind: 'slots'; slots: ModelSlots; reply: string | null; language: string | null }
+  | {
+      kind: 'clarify'
+      message: string
+      question: string
+      language: string | null
+      options: { label: string; description: string; slots: ModelSlots }[]
+    }
 
 export interface RemoteInterpretation {
   slotUpdates: Partial<Slots>
   clarification: Clarification | null
+  /** Prose answer, when the message asked something rather than stated it. */
+  reply: string | null
+  /** Language the message was written in, which the question cards follow. */
+  language: string | null
 }
 
-const TIMEOUT_MS = 20_000
+// The system prompt now carries the whole catalogue, so a reply that also has
+// to be written takes longer than the original extraction-only call did. Below
+// this the app was silently falling back to the offline parser mid-conversation.
+const TIMEOUT_MS = 60_000
+
+/**
+ * Identifies the app to its own API. Not a secret — it ships in this bundle —
+ * it only keeps the deployed route from answering anything that finds the URL.
+ */
+export function appHeader(): Record<string, string> {
+  const token = import.meta.env.VITE_APP_TOKEN
+  return token ? { 'x-packfinder-app': token } : {}
+}
 
 /** Turns the model's flat, user-facing shape into engine slots (mm, sourced). */
-function toSlots(model: ModelSlots): Partial<Slots> {
+function toSlots(model: ModelSlots, current: Slots): Partial<Slots> {
   const updates: Partial<Slots> = {}
 
   if (model.productCategory) {
@@ -41,11 +63,15 @@ function toSlots(model: ModelSlots): Partial<Slots> {
     if (preset) {
       updates.productCategory = { value: preset.id, source: 'chat' }
       // Same defaults the quiz applies when a category is picked — the model
-      // supplies the category, the preset supplies its physical profile.
-      updates.dimensions = { value: preset.dimensions, source: 'inferred' }
-      updates.weight = { value: preset.weight, source: 'inferred' }
-      updates.fragility = { value: preset.fragility, source: 'inferred' }
-      updates.foodContact = { value: Boolean(preset.foodContact), source: 'inferred' }
+      // supplies the category, the preset supplies its physical profile. What
+      // the person has already told us outranks them: a category named later
+      // in the conversation must not wipe the size they typed earlier and
+      // send the quiz back a step.
+      const keep = (slot?: { source: string }) => slot !== undefined && slot.source !== 'inferred'
+      if (!keep(current.dimensions)) updates.dimensions = { value: preset.dimensions, source: 'inferred' }
+      if (!keep(current.weight)) updates.weight = { value: preset.weight, source: 'inferred' }
+      if (!keep(current.fragility)) updates.fragility = { value: preset.fragility, source: 'inferred' }
+      if (!keep(current.foodContact)) updates.foodContact = { value: Boolean(preset.foodContact), source: 'inferred' }
     }
   }
 
@@ -87,15 +113,15 @@ function summariseKnown(slots: Slots): Record<string, unknown> {
   }
 }
 
-export async function interpretRemote(text: string, slots: Slots): Promise<RemoteInterpretation | null> {
+export async function interpretRemote(text: string, slots: Slots, pending: string | null): Promise<RemoteInterpretation | null> {
   const controller = new AbortController()
   const timer = window.setTimeout(() => controller.abort(), TIMEOUT_MS)
 
   try {
     const response = await fetch('/api/interpret', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text, known: summariseKnown(slots) }),
+      headers: { 'content-type': 'application/json', ...appHeader() },
+      body: JSON.stringify({ text, known: summariseKnown(slots), pending }),
       signal: controller.signal,
     })
     if (!response.ok) return null
@@ -109,15 +135,22 @@ export async function interpretRemote(text: string, slots: Slots): Promise<Remot
         // The chip's own text is never re-parsed — the slots the model attached
         // to this reading are applied directly.
         message: option.label,
-        slots: toSlots(option.slots),
+        slots: toSlots(option.slots, slots),
       }))
       return {
         slotUpdates: {},
         clarification: { text: data.message, question: data.question, options },
+        reply: null,
+        language: data.language ?? null,
       }
     }
 
-    return { slotUpdates: toSlots(data.slots), clarification: null }
+    return {
+      slotUpdates: toSlots(data.slots, slots),
+      clarification: null,
+      reply: data.reply ?? null,
+      language: data.language ?? null,
+    }
   } catch {
     return null
   } finally {

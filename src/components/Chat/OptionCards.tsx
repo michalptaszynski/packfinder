@@ -70,7 +70,7 @@ export function OptionCards({ options, selected, draft, onSelect, onDraftChange,
 
       <div
         ref={scrollerRef}
-        className="flex gap-2.5 overflow-x-auto p-0.5 pb-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex gap-3 overflow-x-auto p-0.5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {options.map((option, index) => {
           const isSelected = selected === option.value
@@ -92,7 +92,7 @@ export function OptionCards({ options, selected, draft, onSelect, onDraftChange,
               className={cn(
                 // Grow to share the row when there is space; the min-width
                 // makes the row overflow — and so scroll — once there isn't.
-                'flex min-w-[204px] flex-1 basis-[204px] flex-col overflow-hidden rounded-xl border text-left transition-colors',
+                'flex min-w-[200px] flex-1 basis-[200px] flex-col overflow-hidden rounded-xl border text-left transition-colors',
                 'animate-in fade-in slide-in-from-bottom-4 fill-mode-both duration-300 ease-out',
                 // Filled at rest, clearing on hover — the inverse of the usual
                 // direction, so pointing at a card lifts it off the row.
@@ -114,7 +114,9 @@ export function OptionCards({ options, selected, draft, onSelect, onDraftChange,
               )}
 
               <span className="flex flex-col gap-2 p-3">
-                <RadioDot selected={isSelected} />
+                {/* Only the dot stands clear of the label; a gap on the column
+                    would space the input field off the text too. */}
+                <RadioDot selected={isSelected} className="mb-8" />
                 <span className="flex flex-col gap-0.5">
                   <span className="text-sm font-medium">{option.title}</span>
                   {option.description && (
@@ -123,7 +125,7 @@ export function OptionCards({ options, selected, draft, onSelect, onDraftChange,
                 </span>
 
                 {option.input && (
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-2">
                     {option.input.prefix && <span className="text-xs text-muted-foreground">{option.input.prefix}</span>}
                     <input
                       ref={inputRef}

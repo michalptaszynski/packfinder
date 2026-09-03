@@ -21,9 +21,14 @@ import type { PromptTemplate } from '@/data/promptTemplates'
 import { SlashMenu } from './SlashMenu'
 import { BoxOutline } from './BoxOutline'
 import { QuizControls } from './QuizControls'
-import { ChatHero } from './ChatHero'
-import { AltHeroHeadline, AltHeroStrip } from './ChatHeroAlt'
+import { ChatHero, ChatHeroHeadline } from './ChatHero'
+import { LogoLoader } from '@/components/Grid/LogoLoader'
+import { AltHeroHeadline, AltHeroPrompts, AltHeroStrip } from './ChatHeroAlt'
+import { useT } from '@/i18n/LanguageProvider'
 import { cn } from '@/lib/utils'
+
+/** How far the default hero's header sits from the top of the panel. */
+const HERO_TOP_PX = 112
 
 /** Space the pill's own controls take from the text line: + , mic, send, padding. */
 const PILL_RESERVED_PX = 150
@@ -31,7 +36,29 @@ const PILL_RESERVED_PX = 150
 const SEND_BUTTON_PX = 42
 const MAX_COMPOSER_PX = 220
 
-export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHero: boolean; altQuiz: boolean }) {
+/**
+ * Leaving the empty state is the one moment the panel changes job entirely —
+ * a board you browse becomes a conversation. The loader covers that swap, and
+ * everything then arrives from below: composer first, transcript behind it.
+ */
+const INTRO_LOADER_MS = 2000
+const INTRO_STAGGER_MS = 70
+/** Long enough for the last bubble's delay plus its own run. */
+const INTRO_TOTAL_MS = 1100
+type IntroPhase = 'loader' | 'enter' | null
+
+export function Chat({
+  centered,
+  altHero,
+  altQuiz,
+  topInset = 0,
+}: {
+  centered: boolean
+  altHero: boolean
+  altQuiz: boolean
+  /** Height of anything floating over the top of the panel. */
+  topInset?: number
+}) {
   const state = useSessionState()
   const dispatch = useSessionDispatch()
   const [input, setInput] = useState('')
@@ -48,14 +75,27 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
   const [multiline, setMultiline] = useState(false)
   const [thinking, setThinking] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
+  const [intro, setIntro] = useState<IntroPhase>(null)
   const mirrorRef = useRef<HTMLDivElement>(null)
 
+  const { t, setLanguage } = useT()
   const status = quizStatus(state.slots)
   const isFresh = status.nextStep === 0 && !state.messages.some((m) => m.role === 'user')
   // Alternate empty state: the composer moves to the middle of the panel and
   // the starting points sit under it, instead of a full hero above it.
   const altFresh = altHero && isFresh
+  /** Default hero: headline and composer at the top, the board scrolling under. */
+  const freshV1 = !altHero && isFresh
   const questionPending = !isFresh && (!status.complete || nextRefinement(state.slots) !== null)
+  // What the app is waiting on, handed to the model so an off-script reply can
+  // steer back to it instead of leaving the conversation stranded.
+  const refineStep = nextRefinement(state.slots)
+  const pendingQuestion = status.complete
+    ? refineStep !== null
+      ? t(`refine.${refineStep}`, REFINEMENT_QUESTIONS[refineStep])
+      : null
+    : t(`quiz.${status.nextStep ?? 0}`, QUIZ_QUESTIONS[status.nextStep ?? 0])
+  const introLoading = intro === 'loader'
   const dictation = useDictation((transcript) => setInput((prev) => (prev ? `${prev} ${transcript}` : transcript)))
 
   // A reset empties the transcript; the "already asked" refs have to go back
@@ -67,6 +107,22 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
     announcedComplete.current = false
     lastAnnouncedChoice.current = null
     setClarification(null)
+  }, [isFresh])
+
+  // Fires on the edge out of the empty state only — later messages keep their
+  // own per-bubble entrance and must not be held behind a loader.
+  const wasFresh = useRef(isFresh)
+  useEffect(() => {
+    const leavingHero = wasFresh.current && !isFresh
+    wasFresh.current = isFresh
+    if (!leavingHero) return
+    setIntro('loader')
+    const toEnter = window.setTimeout(() => setIntro('enter'), INTRO_LOADER_MS)
+    const toDone = window.setTimeout(() => setIntro(null), INTRO_LOADER_MS + INTRO_TOTAL_MS)
+    return () => {
+      window.clearTimeout(toEnter)
+      window.clearTimeout(toDone)
+    }
   }, [isFresh])
 
   useEffect(() => {
@@ -81,13 +137,13 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
       const refineStep = nextRefinement(state.slots)
       if (refineStep !== null && refineStep !== lastAskedRefinement.current) {
         lastAskedRefinement.current = refineStep
-        pushAssistant(REFINEMENT_QUESTIONS[refineStep])
+        pushAssistant(REFINEMENT_QUESTIONS[refineStep], `refine.${refineStep}`)
       }
       return
     }
     if (status.nextStep !== null && status.nextStep !== lastAskedStep.current) {
       lastAskedStep.current = status.nextStep
-      pushAssistant(QUIZ_QUESTIONS[status.nextStep])
+      pushAssistant(QUIZ_QUESTIONS[status.nextStep], `quiz.${status.nextStep}`)
     }
   }, [state.slots])
 
@@ -146,15 +202,15 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
     observer.observe(node)
     setBottomHeight(node.getBoundingClientRect().height)
     return () => observer.disconnect()
-  }, [])
+  }, [intro])
 
   useEffect(() => {
     if (isFresh) return
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [state.messages, isFresh, bottomHeight])
 
-  function pushAssistant(text: string) {
-    dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'assistant', text } })
+  function pushAssistant(text: string, i18nKey?: string) {
+    dispatch({ type: 'ADD_MESSAGE', message: { id: crypto.randomUUID(), role: 'assistant', text, i18nKey } })
   }
 
   // The menu is open whenever the composer holds a bare "/query" — no separate
@@ -227,20 +283,30 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
     // rule-based parser is the fallback, so the prototype still works with no
     // API key, offline, or in a static build.
     setThinking(true)
-    const remote = await interpretRemote(trimmed, state.slots)
+    const remote = await interpretRemote(trimmed, state.slots, pendingQuestion)
+
+    // Not awaited: the questions already on screen carry their bundle id, so
+    // they switch language by themselves once the dictionary lands. Blocking
+    // the whole reply on a translation would stall the conversation for as
+    // long as the bundle takes.
+    if (remote?.language) void setLanguage(remote.language)
     setThinking(false)
 
     if (remote) {
-      applyInterpretation(trimmed, remote.slotUpdates, remote.clarification)
+      applyInterpretation(trimmed, remote.slotUpdates, remote.clarification, remote.reply)
       return
     }
 
     const offline = interpretMessage(trimmed, state.slots)
-    applyInterpretation(trimmed, offline.slotUpdates, offline.matched ? null : clarify(trimmed, state.slots))
+    applyInterpretation(trimmed, offline.slotUpdates, offline.matched ? null : clarify(trimmed, state.slots), null)
   }
 
-  function applyInterpretation(text: string, slotUpdates: Partial<Slots>, next: Clarification | null) {
+  function applyInterpretation(text: string, slotUpdates: Partial<Slots>, next: Clarification | null, reply: string | null) {
     const mergedSlots = { ...state.slots, ...slotUpdates }
+
+    // The model's own words come first: it has answered something the
+    // templates below cannot, and the question card stays where it is.
+    if (reply) pushAssistant(reply)
 
     if (Object.keys(slotUpdates).length > 0) {
       dispatch({ type: 'REBUILD_GRID', slots: slotUpdates })
@@ -257,7 +323,9 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
     }
 
     if (Object.keys(slotUpdates).length === 0) {
-      pushAssistant(clarify(text, state.slots).text)
+      // A reply has already carried the turn; the "I'm not sure I've got
+      // that" template on top of it would contradict what was just said.
+      if (!reply) pushAssistant(clarify(text, state.slots).text)
       return
     }
 
@@ -272,30 +340,42 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
     <div className="relative h-full">
       <div ref={scrollRef} className="absolute inset-0 overflow-y-auto">
         <div
-          className={cn('mx-auto flex w-full flex-col gap-4 p-5', centered && 'max-w-[832px]')}
-          style={{ paddingBottom: bottomHeight + 40 }}
+          className={cn('mx-auto flex w-full flex-col gap-4 p-6', centered && !freshV1 && 'max-w-[832px]')}
+          style={
+            freshV1
+              ? { paddingTop: HERO_TOP_PX + bottomHeight + 24 }
+              : { paddingTop: topInset + 24, paddingBottom: bottomHeight + 40 }
+          }
         >
           {altFresh ? null : isFresh ? (
             <ChatHero />
-          ) : (
-            <div className="flex flex-col gap-2.5">
+          ) : introLoading ? null : (
+            <div className="flex flex-col gap-3">
               {state.messages.map((message, index) => (
                 <ChatBubble
                   key={message.id}
                   message={message}
                   joinAbove={state.messages[index - 1]?.role === message.role}
                   joinBelow={state.messages[index + 1]?.role === message.role}
+                  // During the intro the transcript comes in behind the
+                  // composer, one bubble after the next.
+                  delayMs={intro === 'enter' ? 120 + index * INTRO_STAGGER_MS : 0}
                 />
               ))}
               {altQuiz && questionPending && (
-                <QuizControls clarification={clarification} onSend={(text) => void handleSend(text)} altQuiz />
+                <QuizControls
+                  clarification={clarification}
+                  onClarified={() => setClarification(null)}
+                  onSend={(text) => void handleSend(text)}
+                  altQuiz
+                />
               )}
               {thinking && (
-                <div className="flex max-w-[92%] items-center gap-1.5 self-start rounded-2xl bg-muted px-4 py-3.5">
+                <div className="flex max-w-[92%] items-center gap-2 self-start py-2">
                   {[0, 1, 2].map((dot) => (
                     <span
                       key={dot}
-                      className="size-1.5 animate-bounce rounded-full bg-muted-foreground/60"
+                      className="size-2 animate-bounce rounded-full bg-muted-foreground/60"
                       style={{ animationDelay: `${dot * 140}ms` }}
                     />
                   ))}
@@ -306,30 +386,52 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
         </div>
       </div>
 
+      {introLoading && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <LogoLoader size={46} />
+        </div>
+      )}
+
+      {!introLoading && (
       <div
         ref={bottomRef}
+        style={freshV1 ? { top: HERO_TOP_PX } : undefined}
         className={cn(
-          'pointer-events-none absolute inset-x-5 mx-auto flex flex-col gap-2.5',
-          altFresh ? 'top-1/2 -translate-y-1/2' : 'bottom-5',
+          'pointer-events-none absolute inset-x-6 mx-auto flex flex-col gap-3',
+          // Sits below centre — the strip underneath needs the room more than
+          // the empty space above the headline does.
+          // freshV1's offset is an inline style: an interpolated class name
+          // would never make it into the generated CSS.
+          altFresh ? 'top-1/2 translate-y-[calc(-50%+120px)]' : !freshV1 && 'bottom-6',
           centered && 'max-w-[832px]',
+          intro === 'enter' && 'animate-in slide-in-from-bottom-24 fade-in duration-500 ease-out',
         )}
       >
         {altFresh && <AltHeroHeadline />}
+        {freshV1 && <ChatHeroHeadline />}
 
         {!altQuiz && questionPending && (
           <div className="pointer-events-auto">
-            <QuizControls clarification={clarification} onSend={(text) => void handleSend(text)} altQuiz={false} />
+            <QuizControls
+              clarification={clarification}
+              onClarified={() => setClarification(null)}
+              onSend={(text) => void handleSend(text)}
+              altQuiz={false}
+            />
           </div>
         )}
 
         {!isFresh && state.suggestions.length > 0 && (
-          <div className="pointer-events-auto flex flex-wrap gap-1.5">
+          <div className="pointer-events-auto flex flex-wrap gap-2">
             {state.suggestions.map((suggestion) => (
               <Button
                 key={suggestion}
                 variant="outline"
                 size="sm"
-                className="rounded-full bg-card text-xs font-normal text-muted-foreground shadow-sm"
+                // dark:bg-background beats the outline variant's own dark:bg-input/30;
+                // the chips float over the scrolling transcript, so they have
+                // to be opaque.
+                className="rounded-full bg-card text-xs font-normal text-muted-foreground shadow-sm dark:bg-card"
                 onClick={() => void handleSend(suggestion)}
               >
                 {suggestion}
@@ -342,7 +444,7 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
           ref={formRef}
           className={cn(
             // No shadow at rest — it only lifts on hover or while being typed in.
-            'pointer-events-auto relative flex items-center gap-1.5 border border-foreground/15 bg-card transition-shadow duration-200',
+            'pointer-events-auto relative flex items-center gap-2 bg-card transition-shadow duration-200',
             'hover:shadow-[0_18px_28px_-8px_rgb(0_0_0_/_0.12),0_8px_12px_-8px_rgb(0_0_0_/_0.10)]',
             'focus-within:shadow-[0_18px_28px_-8px_rgb(0_0_0_/_0.12),0_8px_12px_-8px_rgb(0_0_0_/_0.10)]',
             // One DOM order for both shapes — the textarea is re-ordered with
@@ -369,7 +471,7 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
               setSlashIndex(0)
               textareaRef.current?.focus()
             }}
-            className={cn('size-9 flex-none rounded-full text-muted-foreground', multiline && 'order-2')}
+            className={cn('size-8 flex-none rounded-full text-muted-foreground', multiline && 'order-2')}
           >
             <Plus size={18} strokeWidth={1.75} />
           </Button>
@@ -405,7 +507,7 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
             )}
           </span>
 
-          <div className={cn('flex flex-none items-center gap-1.5', multiline && 'order-3 ml-auto')}>
+          <div className={cn('flex flex-none items-center gap-2', multiline && 'order-3 ml-auto')}>
             <Button
               type="button"
               variant="ghost"
@@ -414,7 +516,7 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
               title={dictation.supported ? 'Dictate' : "Dictation isn't available in this browser"}
               onClick={dictation.toggle}
               className={cn(
-                'size-9 rounded-full text-muted-foreground',
+                'size-8 rounded-full text-muted-foreground',
                 dictation.isListening && 'bg-over-bg text-over-fg animate-pulse hover:bg-over-bg',
               )}
             >
@@ -422,7 +524,7 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
             </Button>
 
             {input.trim() && (
-              <Button type="submit" size="icon" className="size-9 rounded-full">
+              <Button type="submit" size="icon" className="size-8 rounded-full">
                 <ArrowUp size={16} strokeWidth={2.5} />
               </Button>
             )}
@@ -436,34 +538,61 @@ export function Chat({ centered, altHero, altQuiz }: { centered: boolean; altHer
           />
         </form>
 
+        {altFresh && (
+          <AltHeroPrompts
+            onPick={(text) => {
+              setInput(text)
+              window.requestAnimationFrame(() => {
+                const node = textareaRef.current
+                if (!node) return
+                node.focus()
+                node.setSelectionRange(text.length, text.length)
+              })
+            }}
+          />
+        )}
+
         {altFresh && <AltHeroStrip />}
       </div>
+      )}
     </div>
   )
 }
 
 /** Every message slides up as it lands, the same way the answer cards do. */
-const BUBBLE_ENTRANCE = 'animate-in fade-in slide-in-from-bottom-4 duration-300 ease-out'
+// fill-mode-both matters for the staggered intro: without it a delayed bubble
+// sits fully visible until its turn comes, which is the opposite of a stagger.
+const BUBBLE_ENTRANCE = 'animate-in fade-in slide-in-from-bottom-4 fill-mode-both duration-300 ease-out'
 /**
  * Radii for a run of messages from the same side. A tucked corner only reads
  * as a join when both shapes belong to the same family, so a bubble carrying
  * an attachment drops the pill shape and takes the attachment's radius; the
  * corner where the two meet then tucks to 6px.
  */
-const JOIN_TOP = 'rounded-tr-[6px]'
-const JOIN_BOTTOM = 'rounded-br-[6px]'
+const JOIN_TOP = 'rounded-tr-[4px]'
+const JOIN_BOTTOM = 'rounded-br-[4px]'
 
 function ChatBubble({
   message,
   joinAbove,
   joinBelow,
+  delayMs = 0,
 }: {
   message: ChatMessage
   /** The message before this one is from the same side. */
   joinAbove: boolean
   /** The message after this one is from the same side. */
   joinBelow: boolean
+  /** Holds this bubble back so a whole transcript arrives in sequence. */
+  delayMs?: number
 }) {
+  // Captured once: a later change to animation-delay would retime the
+  // animation and replay it when the intro flag clears.
+  const [delay] = useState(delayMs ? { animationDelay: `${delayMs}ms` } : undefined)
+  const { t } = useT()
+  // A scripted question re-renders in whatever language the conversation has
+  // since turned out to be; anything the model wrote stays as written.
+  const text = message.i18nKey ? t(message.i18nKey, message.text) : message.text
   if (message.role === 'user') {
     // An attachment above the text is itself a join, so the bubble's top
     // corner tucks in whether the neighbour is a sibling message or this
@@ -471,43 +600,53 @@ function ChatBubble({
     const attached = Boolean(message.image || message.dimensions)
 
     return (
-      <div className={cn('flex max-w-[92%] flex-col items-end gap-1.5 self-end', BUBBLE_ENTRANCE)}>
+      <div
+        id={`message-${message.id}`}
+        style={delay}
+        className={cn('flex max-w-[92%] flex-col items-end gap-2 self-end', BUBBLE_ENTRANCE)}
+      >
         {message.image && (
           <img
             src={message.image}
             alt=""
             // Scaled down to fit, never cropped: a fixed box with
             // object-cover was cutting the bottom off portrait shots.
-            className={cn('max-h-72 max-w-60 rounded-xl border border-border', JOIN_BOTTOM)}
+            className={cn('max-h-72 max-w-60 rounded-[16px] border border-border', JOIN_BOTTOM)}
           />
         )}
         {message.dimensions && <BoxOutline dimensions={message.dimensions} size={96} className={JOIN_BOTTOM} />}
         <div
           className={cn(
-            'bg-user-bg px-4 py-2.5 text-sm leading-relaxed text-user-fg',
+            // The one surface left in the transcript: the assistant now speaks
+            // as bare text, so the bubble marks what the person said.
+            // 24px line over 8px padding puts a single-line bubble at 40px;
+            // the multiplier line-height it replaces landed on 42.75.
+            'bg-muted px-4 py-2 text-sm leading-6 text-foreground',
             // A class, not an inline radius: inline styles would beat the
-            // per-corner utility that does the tucking.
-            attached ? 'rounded-[14px]' : 'rounded-full',
+            // per-corner utility that does the tucking. One radius whether or
+            // not something is attached — the shapes have to be one family for
+            // the tucked corner to read as a join.
+            'rounded-[16px]',
             (attached || joinAbove) && JOIN_TOP,
             joinBelow && JOIN_BOTTOM,
           )}
         >
-          {message.text}
+          {text}
         </div>
       </div>
     )
   }
 
+  // No bubble: the assistant is the page talking, not a party in a thread. The
+  // join radii go with it — there are no corners left to tuck.
   return (
     <div
-      className={cn(
-        'max-w-[92%] self-start rounded-2xl bg-muted px-4 py-2.5 text-sm leading-relaxed text-foreground',
-        BUBBLE_ENTRANCE,
-        joinAbove && 'rounded-tl-[6px]',
-        joinBelow && 'rounded-bl-[6px]',
-      )}
+      style={delay}
+      // pre-line: a project's specification arrives as real lines, and folding
+      // them into one paragraph makes it unreadable.
+      className={cn('max-w-[92%] self-start py-1 text-sm leading-6 whitespace-pre-line text-foreground', BUBBLE_ENTRANCE)}
     >
-      {message.text}
+      {text}
     </div>
   )
 }

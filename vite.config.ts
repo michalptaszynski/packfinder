@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import { claudeInterpret, type InterpretRequest } from './server/claudeInterpret'
+import { translateUi, type TranslateRequest } from './server/translateUi'
+import { checkRequest, clientIp } from './server/gate'
 
 /**
  * Exposes POST /api/interpret during `vite dev`. The Anthropic key is read
@@ -18,43 +20,59 @@ function claudeApi(mode: string): Plugin {
   return {
     name: 'packfinder-claude-api',
     configureServer(server) {
-      server.middlewares.use('/api/interpret', (req, res) => {
-        if (req.method !== 'POST') {
-          res.statusCode = 405
-          return res.end()
-        }
-        if (!apiKey) {
-          res.statusCode = 503
-          res.setHeader('content-type', 'application/json')
-          return res.end(JSON.stringify({ error: 'ANTHROPIC_API_KEY is not set — running on the offline parser.' }))
-        }
-
-        let raw = ''
-        req.on('data', (chunk) => (raw += chunk))
-        req.on('end', async () => {
-          try {
-            const body = JSON.parse(raw) as InterpretRequest
-            const result = await claudeInterpret(apiKey, body)
-            res.setHeader('content-type', 'application/json')
-            res.end(JSON.stringify(result))
-          } catch (error) {
-            server.config.logger.error(`[claude] ${String(error)}`)
-            res.statusCode = 502
-            res.setHeader('content-type', 'application/json')
-            res.end(JSON.stringify({ error: String(error) }))
+      /** Both routes read the same body and answer the same way. */
+      function post<T>(path: string, handler: (body: T) => Promise<unknown>) {
+        server.middlewares.use(path, (req, res) => {
+          if (req.method !== 'POST') {
+            res.statusCode = 405
+            return res.end()
           }
+          if (!apiKey) {
+            res.statusCode = 503
+            res.setHeader('content-type', 'application/json')
+            return res.end(JSON.stringify({ error: 'ANTHROPIC_API_KEY is not set — running on the offline parser.' }))
+          }
+
+          // Same gate as the deployed functions, so a local run cannot pass
+          // something production would reject.
+          const gate = checkRequest(req.headers as Record<string, string | string[] | undefined>, clientIp(req.headers as Record<string, string | string[] | undefined>))
+          if (!gate.ok) {
+            res.statusCode = gate.status
+            res.setHeader('content-type', 'application/json')
+            return res.end(JSON.stringify({ error: gate.error }))
+          }
+
+          let raw = ''
+          req.on('data', (chunk) => (raw += chunk))
+          req.on('end', async () => {
+            try {
+              const result = await handler(JSON.parse(raw) as T)
+              res.setHeader('content-type', 'application/json')
+              res.end(JSON.stringify(result))
+            } catch (error) {
+              server.config.logger.error(`[claude] ${String(error)}`)
+              res.statusCode = 502
+              res.setHeader('content-type', 'application/json')
+              res.end(JSON.stringify({ error: String(error) }))
+            }
+          })
         })
-      })
+      }
+
+      post<InterpretRequest>('/api/interpret', (body) => claudeInterpret(apiKey!, body))
+      post<TranslateRequest>('/api/translate', (body) => translateUi(apiKey!, body))
+
     },
   }
 }
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  // Pages serves from a repo subpath; without this the built asset URLs point
-  // at the domain root and the page loads blank. Dev stays at / so the local
-  // URL doesn't grow a prefix.
-  base: mode === 'production' ? '/packfinder/' : '/',
+  // GitHub Pages serves from a repo subpath, so that build needs a prefix;
+  // everywhere else — dev, and any host that serves the app at its own root —
+  // must not have one, or every asset URL points at a directory that is not
+  // there. Set DEPLOY_TARGET=pages for the Pages build only.
+  base: process.env.DEPLOY_TARGET === 'pages' ? '/packfinder/' : '/',
   plugins: [react(), tailwindcss(), claudeApi(mode)],
   resolve: {
     alias: {

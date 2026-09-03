@@ -152,4 +152,9 @@ export interface ChatMessage {
   image?: string
   /** Sizes answered on the dimensions step, redrawn above the bubble. */
   dimensions?: Dimensions
+  /**
+   * Scripted questions store their bundle id, not their words, so a transcript
+   * written before we knew the language re-renders in it afterwards.
+   */
+  i18nKey?: string
 }

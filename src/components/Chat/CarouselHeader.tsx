@@ -13,13 +13,13 @@ export function CarouselHeader({ title, canScrollLeft, canScrollRight, onScrollL
   return (
     <div className="flex items-center justify-between">
       <h3 className="text-sm font-semibold">{title}</h3>
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2">
         <button
           type="button"
           disabled={!canScrollLeft}
           onClick={onScrollLeft}
           className={cn(
-            'flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground',
+            'flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground',
             canScrollLeft ? 'hover:bg-muted' : 'opacity-30',
           )}
         >
@@ -30,7 +30,7 @@ export function CarouselHeader({ title, canScrollLeft, canScrollRight, onScrollL
           disabled={!canScrollRight}
           onClick={onScrollRight}
           className={cn(
-            'flex size-7 items-center justify-center rounded-full border border-border text-muted-foreground',
+            'flex size-8 items-center justify-center rounded-full border border-border text-muted-foreground',
             canScrollRight ? 'hover:bg-muted' : 'opacity-30',
           )}
         >

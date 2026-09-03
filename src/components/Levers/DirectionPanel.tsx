@@ -64,7 +64,7 @@ export function DirectionPanel() {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-col gap-5 px-4 pb-4">
+        <div className="flex flex-col gap-6 px-4 pb-4">
           <DirectionPhoto archetype={archetype} heightClassName="h-48" />
 
           {price?.valid ? (
@@ -84,7 +84,7 @@ export function DirectionPanel() {
             return (
               <div key={category.key} className="flex flex-col gap-2">
                 <span className="text-xs font-medium text-muted-foreground">{category.label}</span>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-2">
                   {relevantOptions.map((option) => {
                     const candidate = [...modifiers.filter((m) => !category.options.includes(m)), option]
                     const check = validateConfiguration(archetype.id, quantity, candidate)
@@ -102,7 +102,7 @@ export function DirectionPanel() {
                         title={!check.valid ? check.reason : undefined}
                         onClick={() => selectModifier(category.options, option)}
                         className={cn(
-                          'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs',
+                          'flex items-center gap-2 rounded-full border px-3 py-2 text-xs',
                           isCurrent ? 'border-state-fg bg-state-bg text-state-fg' : 'border-border bg-card',
                           !check.valid && 'cursor-not-allowed opacity-40',
                         )}
@@ -125,14 +125,14 @@ export function DirectionPanel() {
           {availableAddons.length > 0 && (
             <div className="flex flex-col gap-2">
               <span className="text-xs font-medium text-muted-foreground">Add-ons</span>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {availableAddons.map(([id, def]) => (
                   <button
                     key={id}
                     type="button"
                     onClick={() => dispatch({ type: 'TOGGLE_ADDON', addonId: id })}
                     className={cn(
-                      'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs',
+                      'flex items-center gap-2 rounded-full border px-3 py-2 text-xs',
                       state.selectedAddons.includes(id) ? 'border-state-fg bg-state-bg text-state-fg' : 'border-border bg-card',
                     )}
                   >

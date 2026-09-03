@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Check, CircleHelp, House, Settings } from 'lucide-react'
+import { Check, Settings } from 'lucide-react'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { Button } from '@/components/ui/button'
 import { SessionProvider, useSessionDispatch, useSessionState } from '@/state/SessionProvider'
+import { LanguageProvider, useT } from '@/i18n/LanguageProvider'
+import { downloadSpecification } from '@/lib/specPdf'
 import { quizStatus } from '@/state/quizStatus'
 import { Chat } from '@/components/Chat/Chat'
+import { Sidebar } from '@/components/Nav/Sidebar'
+import { ChatTopBar } from '@/components/Chat/ChatTopBar'
+import { InspirationsBoard } from '@/components/Nav/InspirationsBoard'
 import { Grid } from '@/components/Grid/Grid'
 import { GridFilterBar, type ViewMode } from '@/components/Grid/GridFilterBar'
 import { FlowView } from '@/components/Grid/FlowView'
@@ -23,13 +27,21 @@ const maxPanelWidth = () => Math.round(window.innerWidth / 2)
 function Shell() {
   const state = useSessionState()
   const dispatch = useSessionDispatch()
+  const { t } = useT()
   const status = quizStatus(state.slots)
   const [isGenerating, setIsGenerating] = useState(false)
   const [panelWidth, setPanelWidth] = useState(DEFAULT_PANEL_WIDTH)
-  const [altHero, setAltHero] = useState(true)
+  const [altHero, setAltHero] = useState(false)
   const [altQuiz, setAltQuiz] = useState(true)
   const [logoLoader, setLogoLoader] = useState(true)
   const [view, setView] = useState<ViewMode>('grid')
+  const [inspirations, setInspirations] = useState(false)
+  const [railCollapsed, setRailCollapsed] = useState(false)
+  function startOver() {
+    announcedComplete.current = false
+    setIsGenerating(false)
+    dispatch({ type: 'RESET_SESSION' })
+  }
   const [dark, setDark] = useState(true)
 
   useEffect(() => {
@@ -59,12 +71,40 @@ function Shell() {
 
   const showRightPanel = status.complete
 
+  /** The rail steps aside for the results and comes back with a fresh brief. */
+  const railVisible = !showRightPanel
+
+
   return (
-    <div className="flex h-svh w-full gap-3 overflow-hidden bg-canvas p-3">
+    <div className="flex h-svh w-full overflow-hidden bg-background">
+      {railVisible && (
+      <div className="flex flex-none p-3 pr-0">
+        <Sidebar
+          onReset={() => {
+            setInspirations(false)
+            startOver()
+          }}
+          inspirationsOpen={inspirations}
+          onInspirationsToggle={() => setInspirations((value) => !value)}
+          collapsed={railCollapsed}
+          onCollapsedChange={setRailCollapsed}
+        />
+      </div>
+      )}
+
+      {/* Full-bleed rule between the rail and the workspace — it has to reach
+          the window edges, so it sits outside the padded columns. */}
+      {railVisible && <span className="w-px flex-none self-stretch bg-border" aria-hidden />}
+
+      <div className="flex min-w-0 flex-1 gap-3 p-3">
+      {inspirations ? (
+        <InspirationsBoard onClose={() => setInspirations(false)} />
+      ) : (
+      <>
       <aside
         style={showRightPanel ? { width: panelWidth } : undefined}
         className={cn(
-          'flex flex-none flex-col overflow-hidden rounded-xl border border-border bg-card',
+          'flex flex-none flex-col',
           // The width animation is what makes the panel slide in; while a drag
           // is running it has to be off, or every pointer move would be eased
           // and the handle would lag behind the cursor.
@@ -72,32 +112,22 @@ function Shell() {
           !showRightPanel && 'w-full',
         )}
       >
-        <div className="flex h-11 flex-none items-center justify-between border-b border-border px-4">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            title="Start over"
-            onClick={() => {
-              announcedComplete.current = false
-              setIsGenerating(false)
-              dispatch({ type: 'RESET_SESSION' })
-            }}
-            className="text-muted-foreground"
-          >
-            <House size={16} strokeWidth={1.75} />
-          </Button>
-          <div className="flex items-center gap-1.5">
-            <Button variant="outline" size="sm" className="font-normal text-muted-foreground">
-              Browse products
-            </Button>
-            <Button variant="ghost" size="icon-sm" className="text-muted-foreground">
-              <CircleHelp size={16} strokeWidth={1.75} />
-            </Button>
-          </div>
-        </div>
-
         <div className="relative min-h-0 flex-1">
-          <Chat centered={!showRightPanel} altHero={altHero} altQuiz={altQuiz} />
+          {!railVisible && (
+            <ChatTopBar
+              onHome={startOver}
+              onDownloadSpec={() =>
+                void downloadSpecification(
+                  state.slots,
+                  state.cards.find((card) => card.direction.id === state.chosenDirectionId),
+                  t,
+                )
+              }
+            />
+          )}
+
+          {/* The bar floats, so the transcript has to start below it. */}
+          <Chat centered={!showRightPanel} altHero={altHero} altQuiz={altQuiz} topInset={railVisible ? 0 : 56} />
         </div>
       </aside>
 
@@ -130,6 +160,10 @@ function Shell() {
           )}
         </main>
       )}
+
+      </>
+      )}
+      </div>
 
       <DirectionPanel />
       <Handoff />
@@ -189,8 +223,8 @@ function SettingsMenu({
   return (
     <div ref={rootRef} className="fixed right-4 bottom-4 z-50">
       {open && (
-        <div className="absolute right-0 bottom-11 w-56 overflow-hidden rounded-xl border border-border bg-card py-1 shadow-xl">
-          <p className="px-3 py-1.5 text-xs text-muted-foreground">Layout</p>
+        <div className="absolute right-0 bottom-12 w-56 overflow-hidden rounded-xl border border-border bg-card py-1 shadow-xl">
+          <p className="px-3 py-2 text-xs text-muted-foreground">Layout</p>
           <button
             type="button"
             onClick={() => onAltHeroChange(!altHero)}
@@ -208,7 +242,7 @@ function SettingsMenu({
             {altQuiz && <Check size={15} className="text-primary" />}
           </button>
 
-          <p className="border-t border-border px-3 pt-2 pb-1.5 text-xs text-muted-foreground">Loading</p>
+          <p className="border-t border-border px-3 pt-2 pb-2 text-xs text-muted-foreground">Loading</p>
           <button
             type="button"
             onClick={() => onLogoLoaderChange(!logoLoader)}
@@ -218,7 +252,7 @@ function SettingsMenu({
             {logoLoader && <Check size={15} className="text-primary" />}
           </button>
 
-          <p className="border-t border-border px-3 pt-2 pb-1.5 text-xs text-muted-foreground">Appearance</p>
+          <p className="border-t border-border px-3 pt-2 pb-2 text-xs text-muted-foreground">Appearance</p>
           <button
             type="button"
             onClick={() => onDarkChange(!dark)}
@@ -235,7 +269,7 @@ function SettingsMenu({
         title="Prototype settings"
         onClick={() => setOpen((value) => !value)}
         className={cn(
-          'flex size-9 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition-colors',
+          'flex size-8 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition-colors',
           open ? 'bg-fill-hover text-foreground' : 'hover:text-foreground',
         )}
       >
@@ -288,7 +322,10 @@ function PanelResizer({ width, isDragging, onDragChange, onResize, onReset, max 
         e.preventDefault()
       }}
       className={cn(
-        'group/resizer relative -mx-1.5 flex w-3 flex-none cursor-col-resize items-center justify-center outline-none',
+        // -my-3 escapes the workspace padding so the rule meets the window
+        // edges; the wider hit area stays centred on it, and -mx-1 keeps it
+        // taking no width in the flow.
+        'group/resizer relative -mx-1 -my-3 flex w-2 flex-none cursor-col-resize items-stretch justify-center outline-none',
         // While dragging, the cursor can outrun the handle; a full-screen
         // overlay keeps the pointer events coming and stops text selection.
         isDragging && 'z-30',
@@ -296,9 +333,9 @@ function PanelResizer({ width, isDragging, onDragChange, onResize, onReset, max 
     >
       <span
         className={cn(
-          'h-10 w-1 rounded-full bg-border opacity-0 transition-opacity',
-          'group-hover/resizer:opacity-100 group-focus-visible/resizer:opacity-100',
-          isDragging && 'bg-primary opacity-100',
+          'w-px self-stretch bg-border transition-colors',
+          'group-hover/resizer:bg-foreground/30 group-focus-visible/resizer:bg-foreground/30',
+          isDragging && 'bg-primary',
         )}
       />
       {isDragging && <span className="fixed inset-0 cursor-col-resize" />}
@@ -309,9 +346,11 @@ function PanelResizer({ width, isDragging, onDragChange, onResize, onReset, max 
 function App() {
   return (
     <SessionProvider>
-      <TooltipProvider>
-        <Shell />
-      </TooltipProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Shell />
+        </TooltipProvider>
+      </LanguageProvider>
     </SessionProvider>
   )
 }

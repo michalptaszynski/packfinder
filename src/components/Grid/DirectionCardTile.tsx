@@ -59,7 +59,7 @@ export function DirectionCardTile({ card, highlighted, chosen, delayMs, onOpen }
       </div>
 
       {badges.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {badges.map((badge) => (
             <Badge key={badge.kind} variant="outline" className={cn('rounded-full px-2 py-0.5 text-[10px] font-normal', BADGE_CLASS[badge.kind])}>
               {badge.label}

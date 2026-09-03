@@ -37,8 +37,6 @@
     --color-over-bg: var(--over-bg);
     --color-over-fg: var(--over-fg);
     --color-over-bar: var(--over-bar);
-    --color-user-bg: var(--user-bg);
-    --color-user-fg: var(--user-fg);
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -55,16 +53,12 @@
     --text: #1a1a19;
     --text-muted: #8b8b87;
     --fill-hover: #f6f6f5;
-    --action: #1e63e9;
-    --state-bg: #e8f0fd;
-    --state-fg: #1e4fa3;
+    --action: #2757ff; /* PH Blue, the redesign's brand blue (--blue-600) */
+    --state-bg: #edf3ff; /* --blue-50 */
+    --state-fg: #0b38d5; /* --blue-700 */
     --over-bg: #fdf3e3;
     --over-fg: #8a5b12;
     --over-bar: #d9a441;
-    /* Your own messages: near-black bubble, light type. */
-    --user-bg: #1a1a19;
-    --user-fg: #f3f3f1;
-
     /* shadcn semantic slots mapped onto the tokens above */
     --background: var(--canvas);
     --foreground: var(--text);
@@ -98,16 +92,12 @@
     --text: #ededed;
     --text-muted: #8f8f8f;
     --fill-hover: #262626;
-    --action: #4a86ff;
+    --action: #2757ff;
     --state-bg: #1d2c47;
     --state-fg: #a8c7ff;
     --over-bg: #3a2e15;
     --over-fg: #e3b463;
     --over-bar: #d9a441;
-    /* Darker than the panel it sits on, so it still reads as "mine". */
-    --user-bg: #0c0c0c;
-    --user-fg: #ededed;
-
     --primary-foreground: #0f1420;
     --destructive: oklch(0.62 0.21 25);
 }
@@ -166,7 +156,26 @@
   }
 }
 
+/* The rail's mark: the same stroke, run only while the logo is hovered. */
+.lg-stream-rail {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 4.4;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: 100;
+}
+
+.group\/logo:hover .lg-stream-rail {
+  animation: lg-flow 2.6s infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .lg-stream-rail {
+    animation: none;
+  }
+
   .lg-stream {
     animation: none;
     stroke-dashoffset: 0;

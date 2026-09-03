@@ -91,7 +91,7 @@ function StageNode({ stage, isLast, highlightedId, onOpen }: StageNodeProps) {
       </div>
 
       {lead && (
-        <button type="button" onClick={() => onOpen(lead.direction.id)} className="flex flex-col gap-1.5 text-left">
+        <button type="button" onClick={() => onOpen(lead.direction.id)} className="flex flex-col gap-2 text-left">
           <DirectionPhoto
             archetype={lead.archetype}
             aspect={1.15}

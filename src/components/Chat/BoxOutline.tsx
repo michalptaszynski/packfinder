@@ -50,7 +50,7 @@ export function BoxOutline({ dimensions, highlight = null, size = 116, className
   const lit = 'stroke-primary'
 
   return (
-    <div className={cn('flex flex-none items-center justify-center rounded-xl bg-fill-hover p-2', className)}>
+    <div className={cn('flex flex-none items-center justify-center rounded-[16px] bg-fill-hover p-2', className)}>
       <svg
         viewBox={`0 0 ${VIEW} ${VIEW}`}
         width={size}

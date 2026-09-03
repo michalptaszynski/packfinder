@@ -50,10 +50,10 @@ export function GridFilterBar({ view, onViewChange }: { view: ViewMode; onViewCh
     // Three floating bars: the view switch on the left edge, the result
     // filters centred on the panel, and Filters on the right edge. Equal outer
     // grid tracks keep the middle bar centred whatever the other two measure.
-    <div className="pointer-events-none absolute inset-x-0 bottom-5 z-30 grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-6">
+    <div className="pointer-events-none absolute inset-x-0 bottom-6 z-30 grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-6">
       {/* Its own bar on the far left: switching what you are looking at is a
           different job from narrowing what is in it. */}
-      <div className="pointer-events-auto justify-self-start flex items-center gap-0.5 rounded-full border border-border bg-card/80 p-1 shadow-[0_1px_2px_rgba(0,0,0,0.08)] backdrop-blur-[8px]">
+      <div className="pointer-events-auto justify-self-start flex h-10 items-center gap-1 rounded-full border border-border bg-card/80 p-1 shadow-[0_1px_2px_rgba(0,0,0,0.08)] backdrop-blur-[8px]">
         {(
           [
             { value: 'grid' as const, icon: LayoutGrid, label: 'Grid' },
@@ -81,7 +81,10 @@ export function GridFilterBar({ view, onViewChange }: { view: ViewMode; onViewCh
         // Same glass recipe as the sticky summary bar in the redesign's
         // build-your-box: 80% white, 8px backdrop blur, a 1px shadow and no
         // border.
-        className="pointer-events-auto flex items-center gap-1 rounded-full border border-border bg-card/80 p-1 shadow-[0_1px_2px_rgba(0,0,0,0.08)] backdrop-blur-[8px]"
+        // h-10 rather than letting the content set it: the Filters trigger next
+        // to it is 40px, and a 2px mismatch between floating bars reads as a
+        // misalignment.
+        className="pointer-events-auto flex h-10 items-center gap-1 rounded-full border border-border bg-card/80 p-1 shadow-[0_1px_2px_rgba(0,0,0,0.08)] backdrop-blur-[8px]"
       >
         <div ref={groupRef} className="relative">
           {pill && (

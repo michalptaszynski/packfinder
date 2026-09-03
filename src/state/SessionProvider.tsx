@@ -2,9 +2,16 @@ import { createContext, useContext, useReducer } from 'react'
 import type { Dispatch, ReactNode } from 'react'
 import type { ChatMessage, DirectionCard, GridFilter, Slots } from '../types'
 import { buildGrid } from '../engine/grid'
-import { QUIZ_QUESTIONS } from '../data/categoryPresets'
+import { CATEGORY_PRESETS, QUIZ_QUESTIONS } from '../data/categoryPresets'
 
 export type Screen = 'conversation' | 'handoff'
+
+export interface Project {
+  id: string
+  label: string
+  slots: Slots
+  savedAt: number
+}
 
 export interface SessionState {
   screen: Screen
@@ -21,6 +28,8 @@ export interface SessionState {
   selectedAddons: string[]
   messages: ChatMessage[]
   suggestions: string[]
+  /** Briefs archived when a new one is started, newest first. */
+  projects: Project[]
 }
 
 export type Action =
@@ -37,6 +46,8 @@ export type Action =
   | { type: 'GO_TO_HANDOFF' }
   | { type: 'BACK_TO_CONVERSATION' }
   | { type: 'RESET_SESSION' }
+  | { type: 'START_FROM_PROJECT'; slots: Slots; messages: ChatMessage[] }
+  | { type: 'RESTORE_PROJECT'; id: string }
 
 function defaultHighlight(cards: DirectionCard[]): string | null {
   const firstSelectable = cards.find((c) => c.selectable)
@@ -55,16 +66,75 @@ const initialState: SessionState = {
   chosenDirectionId: null,
   customModifiers: null,
   selectedAddons: [],
-  messages: [{ id: 'quiz-q0', role: 'assistant', text: QUIZ_QUESTIONS[0] }],
+  // Carries its bundle id like every other scripted question, so the opener
+  // switches language too once the conversation turns out not to be English.
+  messages: [{ id: 'quiz-q0', role: 'assistant', text: QUIZ_QUESTIONS[0], i18nKey: 'quiz.0' }],
   suggestions: [],
+  projects: [],
+}
+
+/** "Cosmetics · 250 pcs" — enough to recognise a brief in a list. */
+function describeBrief(slots: Slots): string {
+  const parts: string[] = []
+  const preset = CATEGORY_PRESETS.find((preset) => preset.id === slots.productCategory?.value)
+  if (preset) parts.push(preset.label)
+  if (slots.quantity) parts.push(`${slots.quantity.value} pcs`)
+  return parts.length > 0 ? parts.join(' · ') : 'Untitled brief'
 }
 
 function reducer(state: SessionState, action: Action): SessionState {
   switch (action.type) {
     // Back to a blank brief. The message list is rebuilt from initialState, so
     // the first question is asked again rather than duplicated.
-    case 'RESET_SESSION':
-      return { ...initialState, messages: [...initialState.messages] }
+    case 'RESET_SESSION': {
+      // A brief worth remembering is one that answered something; an untouched
+      // session is not archived.
+      const answered = Object.keys(state.slots).length > 0
+      const projects = answered
+        ? [
+            { id: crypto.randomUUID(), label: describeBrief(state.slots), slots: state.slots, savedAt: Date.now() },
+            ...state.projects,
+          ].slice(0, 8)
+        : state.projects
+      return { ...initialState, messages: [...initialState.messages], projects }
+    }
+
+    // A past project as the opening position: same archiving as a reset, then
+    // the brief starts already holding what that project settled.
+    case 'START_FROM_PROJECT': {
+      const answered = Object.keys(state.slots).length > 0
+      const projects = answered
+        ? [
+            { id: crypto.randomUUID(), label: describeBrief(state.slots), slots: state.slots, savedAt: Date.now() },
+            ...state.projects,
+          ].slice(0, 8)
+        : state.projects
+      const cards = buildGrid(action.slots, 'all')
+      return {
+        ...initialState,
+        projects,
+        slots: action.slots,
+        cards,
+        highlightedDirectionId: defaultHighlight(cards),
+        messages: [...initialState.messages, ...action.messages],
+      }
+    }
+
+    case 'RESTORE_PROJECT': {
+      const project = state.projects.find((p) => p.id === action.id)
+      if (!project) return state
+      const cards = buildGrid(project.slots, 'all')
+      return {
+        ...initialState,
+        projects: state.projects,
+        slots: project.slots,
+        cards,
+        highlightedDirectionId: defaultHighlight(cards),
+        messages: [
+          { id: crypto.randomUUID(), role: 'assistant', text: `Picked up: ${project.label}.` },
+        ],
+      }
+    }
 
     case 'MERGE_SLOTS':
       return { ...state, slots: { ...state.slots, ...action.slots } }

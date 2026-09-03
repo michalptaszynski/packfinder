@@ -52,13 +52,13 @@ export function FiltersMenu() {
         // Carries the same glass recipe as the other floating bars, since it
         // stands on its own now.
         className={cn(
-          'flex h-[42px] items-center gap-1.5 rounded-full border border-border px-3.5 text-sm shadow-[0_1px_2px_rgba(0,0,0,0.08)] backdrop-blur-[8px] transition-colors',
+          'flex h-10 items-center gap-2 rounded-full border border-border px-3 text-sm shadow-[0_1px_2px_rgba(0,0,0,0.08)] backdrop-blur-[8px] transition-colors',
           open ? 'bg-fill-hover' : 'bg-card/80 hover:bg-fill-hover',
         )}
       >
         Filters
         {active > 0 && (
-          <span className="flex size-5 items-center justify-center rounded-full bg-state-bg text-[11px] font-medium text-state-fg tabular-nums">
+          <span className="flex size-4 items-center justify-center rounded-full bg-state-bg text-[11px] font-medium text-state-fg tabular-nums">
             {active}
           </span>
         )}
@@ -100,7 +100,7 @@ export function FiltersMenu() {
           </Row>
 
           <Row label="Product size">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               {(['w', 'h', 'd'] as const).map((axis) => (
                 <input
                   key={axis}
@@ -169,7 +169,7 @@ function countActive(slots: Slots): number {
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       <span className="text-xs text-muted-foreground">{label}</span>
       {children}
     </div>
@@ -186,14 +186,14 @@ function Chips({
   onChange: (value: string) => void
 }) {
   return (
-    <div className="flex flex-wrap gap-1.5">
+    <div className="flex flex-wrap gap-2">
       {options.map((option) => (
         <button
           key={option.value}
           type="button"
           onClick={() => onChange(option.value)}
           className={cn(
-            'rounded-full border px-2.5 py-1 text-xs transition-colors',
+            'rounded-full border px-3 py-1 text-xs transition-colors',
             option.value === value
               ? 'border-primary bg-state-bg text-state-fg'
               : 'border-input text-muted-foreground hover:bg-fill-hover',
